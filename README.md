@@ -2,7 +2,9 @@
 
 ## Installation
 
-`pip install git+https://github.com/multimeric/FileSenderCli.git`
+```bash
+pip install git+ssh://git@github.com/multimeric/FileSenderCli
+```
 
 ## Usage
 

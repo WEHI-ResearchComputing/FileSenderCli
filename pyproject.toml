@@ -15,7 +15,8 @@ classifiers = [
 dependencies = [
     "typer",
     "requests",
-    "beautifulsoup4"
+    "beautifulsoup4",
+    "rich"
 ]
 dynamic = ["version"]
 
