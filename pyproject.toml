@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "filesender-client"
+description = "FileSender Python CLI and API client"
+readme = "README.rst"
+requires-python = ">=3.8"
+keywords = ["one", "two"]
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "typer",
+    "requests",
+    "beautifulsoup4"
+]
+dynamic = ["version"]
+
+[project.scripts]
+filesender = "filesender.main:app"
