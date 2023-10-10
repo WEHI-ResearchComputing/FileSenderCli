@@ -150,6 +150,7 @@ def download(
     out_dir: Annotated[Path, Option(dir_okay=True, file_okay=False, exists=True, help="Path to the directory to store the output files")] = Path.cwd(),
     threads: Annotated[int, Option(help="Maximum number of threads to use to download the files concurrently")] = 1
 ):
+    """Downloads all files associated with a transfer"""
     client = FileSenderClient(
         auth=Auth(),
         base_url=context.obj["base_url"]
