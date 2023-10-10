@@ -32,7 +32,7 @@ def get_defaults() -> dict:
 context = {
     "default_map": get_defaults()
 }
-app = Typer()
+app = Typer(name="filesender")
 
 
 @app.callback(context_settings=context)
