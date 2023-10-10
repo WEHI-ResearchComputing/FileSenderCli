@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 from typing_extensions import TypedDict, NotRequired
 
 class File(TypedDict):
@@ -7,9 +7,28 @@ class File(TypedDict):
     mime_type: NotRequired[str]
     cid: NotRequired[str]
 
-Transfer = TypedDict("Transfer", {
-    "files": List[File],
-    "options": NotRequired[List[str]],
+class TransferOptions(TypedDict, total=False):
+    email_me_copies: bool
+    email_me_on_expire: bool
+    email_upload_complete: bool
+    email_download_complete: bool
+    email_daily_statistics: bool
+    email_report_on_closing: bool
+    enable_recipient_email_download_complete: bool
+    add_me_to_recipients: bool
+    email_recipient_when_transfer_expires: bool
+    get_a_link: bool
+    hide_sender_email: bool
+    redirect_url_on_complete: str
+    encryption: bool
+    collection: bool
+    must_be_logged_in_to_download: bool
+    storage_cloud_s3_bucket: bool
+    web_notification_when_upload_is_complete: bool
+    verify_email_to_download: bool
+
+PartialTransfer = TypedDict("Transfer", {
+    "options": NotRequired[TransferOptions],
     "expires": NotRequired[int],
     "subject": NotRequired[str],
     "message": NotRequired[str],
@@ -17,6 +36,9 @@ Transfer = TypedDict("Transfer", {
     "recipients": NotRequired[List[str]],
     "from": NotRequired[str]
 })
+
+class Transfer(PartialTransfer):
+    files: List[File]
 
 class TransferUpdate(TypedDict):
     complete: NotRequired[bool]

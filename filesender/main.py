@@ -11,6 +11,7 @@ from rich import print
 from pathlib import Path
 from configparser import ConfigParser
 from filesender.auth import Auth, UserAuth, GuestAuth
+from filesender.request_types import PartialTransfer
 
 def get_defaults() -> dict:
     defaults = {}
@@ -107,7 +108,7 @@ def upload(
 def upload_workflow(
     client: FileSenderClient,
     files: List[Path],
-    transfer_args: Any
+    transfer_args: PartialTransfer
 ):
     """
     Reusable function for uploading one or more files
@@ -122,6 +123,9 @@ def upload_workflow(
             "name": file.name,
             "size": file.stat().st_size
         } for file in files],
+        "options": {
+            "email_download_complete": True,
+        },
         **transfer_args
     })
     client.session.params["roundtriptoken"] = transfer["roundtriptoken"]
