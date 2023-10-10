@@ -40,25 +40,9 @@ def common_args(
     base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
     context: Context
 ):
-    session = requests.Session()
-    if "apikey" in context.params and "username" in context.params:
-        auth =  UserAuth(
-            api_key=context.params["api_key"],
-            username=context.params["username"]
-        ) 
-    elif "guest_token" in context.params:
-        auth = GuestAuth(
-            guest_token=context.params["guest_token"]
-        )
-        auth.prepare(session)
-    else:
-        auth = Auth()
-
-    context.obj = FileSenderClient(
-        base_url=base_url,
-        auth=auth,
-        session=session
-    )
+    context.obj = {
+        "base_url": base_url
+    }
 
 @app.command(context_settings=context)
 def invite(
@@ -70,7 +54,13 @@ def invite(
     """
     Invites a user to send files to you
     """
-    client = cast(FileSenderClient, context.obj)
+    client = FileSenderClient(
+        auth=UserAuth(
+            api_key=apikey,
+            username=username
+        ),
+        base_url=context.obj["base_url"]
+    )
     print(client.create_guest({
         "from": username,
         "recipient": recipient
@@ -86,7 +76,12 @@ def upload_voucher(
     """
     Uploads files to a voucher that you have been invited to
     """
-    client = cast(FileSenderClient, context.obj)
+    auth = GuestAuth(guest_token=guest_token)
+    client = FileSenderClient(
+        auth=auth,
+        base_url=context.obj["base_url"]
+    )
+    auth.prepare(client.session)
     upload_workflow(client, files, {"from": email, "recipients": []})
 
 @app.command(context_settings=context)
@@ -100,7 +95,13 @@ def upload(
     """
     Sends files to an email of choice
     """
-    client = cast(FileSenderClient, context.obj)
+    client = FileSenderClient(
+        auth=UserAuth(
+            api_key=apikey,
+            username=username
+        ),
+        base_url=context.obj["base_url"]
+    )
     upload_workflow(client, files, {"recipients": recipients, "from": username})
 
 def upload_workflow(
@@ -149,7 +150,10 @@ def download(
     out_dir: Annotated[Path, Option(dir_okay=True, file_okay=False, exists=True, help="Path to the directory to store the output files")] = Path.cwd(),
     threads: Annotated[int, Option(help="Maximum number of threads to use to download the files concurrently")] = 1
 ):
-    client = cast(FileSenderClient, context.obj)
+    client = FileSenderClient(
+        auth=Auth(),
+        base_url=context.obj["base_url"]
+    )
     with ThreadPoolExecutor(max_workers=threads) as executor:
         for file in files_from_token(token, client.session):
             executor.submit(

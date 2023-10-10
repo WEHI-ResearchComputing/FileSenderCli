@@ -31,10 +31,17 @@ class UserAuth(Auth):
     api_key: str
 
     def sign(self, request: SignType, session: Session) -> SignType:
-        request.params.update(
+        # We have to sort the params alphabetically for calculating
+        # the signature
+        request.params = dict(sorted(dict(
             remote_user = self.username,
-            timestamp = str(round(time.time()))
-        ) 
+            timestamp = str(round(time.time())),
+            # Manually add the session params so we can force them to be
+            # alphabetical order
+            **session.params,
+            **request.params
+        ).items()))
+        
         signature = hmac.new(
             key=self.api_key.encode(),
             digestmod=hashlib.sha1
