@@ -1,14 +1,15 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List, Optional, Iterator, Tuple
 import requests
 import filesender.response_types as response
 import filesender.request_types as request
 from requests import Request, Response, HTTPError
 from urllib.parse import urlparse, urlunparse, unquote
-from io import IOBase
 from filesender.auth import Auth
 from shutil import copyfileobj
 from pathlib import Path
+from io import IOBase
+from concurrent.futures import Executor, ThreadPoolExecutor, ProcessPoolExecutor, wait
 
 def url_without_scheme(url: str) -> str:
     """
@@ -29,6 +30,18 @@ def raise_status(response: Response):
     except HTTPError as e:
         raise Exception(f"Request failed with content {e.response.json()}") from e
 
+def yield_chunks(file: IOBase, chunk_size: int) -> Iterator[Tuple[bytes, int]]:
+    """
+    Yields (chunk, offset) tuples from a file, chunked by chunk_size
+    """
+    offset = 0
+    while True:
+        chunk = file.read(chunk_size)
+        if not chunk:
+            break
+        yield chunk, offset
+        offset += len(chunk)
+
 @dataclass
 class FileSenderClient:
     """
@@ -36,10 +49,34 @@ class FileSenderClient:
     """
     #: The base url of the file sender's API. For example https://filesender.aarnet.edu.au/rest.php
     base_url: str
+    #: Size of upload chunks
+    chunk_size: int
     #: Authentication provider that will be used for all privileged requests
     auth: Auth
+    # Session to use for all HTTP requests
+    session: requests.Session
+    executor: Executor
 
-    session: requests.Session = requests.Session()
+    def __init__(
+        self,
+        base_url: str,
+        chunk_size: Optional[int] = None,
+        auth: Auth = Auth(),
+        session: requests.Session = requests.Session(),
+        threads: int = 1
+    ):
+        self.base_url = base_url
+        self.auth = auth
+        self.session = session
+        self.executor = ProcessPoolExecutor(max_workers=threads)
+        
+        info = self.get_server_info()
+        if chunk_size is None:
+            self.chunk_size = info["upload_chunk_size"]
+        elif chunk_size > info["upload_chunk_size"]:
+            raise Exception(f"--chunk-size can't be greater than the server's maximum supported chunk size. For this server, the maximum is {info['upload_chunk_size']}")
+        else:
+            self.chunk_size = chunk_size
 
     def sign_send(self, request: Request) -> Any:
         """
@@ -82,26 +119,50 @@ class FileSenderClient:
             json=body,
         ))
 
-    def upload_chunk(
+    def upload_file(
         self,
-        file_id: int,
+        file_info: response.File,
+        file: IOBase
+    ):
+        """
+        Uploads a file, with multiple chunks being uploaded in parallel
+        """
+        futures = []
+        for chunk, offset in yield_chunks(file, self.chunk_size):
+            request = self._upload_chunk_request(
+                chunk=chunk,
+                offset=offset,
+                file_info=file_info
+            ).prepare()
+            futures.append(self.executor.submit(self.session.send, request))
+        return wait(futures)
+
+    def _upload_chunk_request(
+        self,
+        file_info: response.File,
         offset: int,
-        chunk: IOBase
-    ) -> response.File:
-        data = chunk.read()
-        return self.sign_send(Request(
+        chunk: bytes,
+    ) -> requests.Request:
+        return self.auth.sign(Request(
             "PUT",
-            f"{self.base_url}/file/{file_id}/chunk/{offset}",
-            data=data,
+            f"{self.base_url}/file/{file_info['id']}/chunk/{offset}",
+            data=chunk,
             headers={
                 "Content-Type": 'application/octet-stream',
-                "X-Filesender-File-Size": str(len(data)),
-                "X-Filesender-Chunk-Offset": str(0),
-                "X-Filesender-Chunk-Size": str(len(data))
+                "X-Filesender-File-Size": str(file_info["size"]),
+                "X-Filesender-Chunk-Offset": str(offset),
+                "X-Filesender-Chunk-Size": str(len(chunk))
             },
-        ))
-        
+        ), self.session)
 
+    def upload_chunk(
+        self,
+        file_info: response.File,
+        offset: int,
+        chunk: bytes,
+    ) -> response.File:
+        return self.sign_send()
+        
     def create_guest(
         self,
         body: request.Guest
@@ -132,3 +193,50 @@ class FileSenderClient:
 
         with (out_dir / filename).open("wb") as fp:
             copyfileobj(res.raw, fp)
+
+    def get_server_info(
+        self
+    ) -> response.ServerInfo:
+        return requests.get(f"{self.base_url}/info").json()
+
+    def upload_workflow(
+        self,
+        files: List[Path],
+        transfer_args: request.PartialTransfer
+    ) -> response.Transfer:
+        """
+        Reusable function for uploading one or more files
+        Args:
+            transfer_args: Additional options to include when creating the transfer, for example a subject or message
+        """
+        files_by_name = {
+            path.name: path for path in files
+        }
+        transfer = self.create_transfer({
+            "files": [{
+                "name": file.name,
+                "size": file.stat().st_size
+            } for file in files],
+            "options": {
+                "email_download_complete": True,
+            },
+            **transfer_args
+        })
+        self.session.params["roundtriptoken"] = transfer["roundtriptoken"]
+        for file in transfer["files"]:
+            with files_by_name[file["name"]].open("rb") as fp:
+                # list forces the processing to occur
+                list(self.upload_file(
+                    file_info=file,
+                    file=fp
+                ))
+                self.update_file(
+                    file_id=file["id"],
+                    body={"complete": True}
+                )
+
+        transfer = self.update_transfer(
+            transfer_id=transfer["id"],
+            body={"complete": True}
+        )
+        return transfer

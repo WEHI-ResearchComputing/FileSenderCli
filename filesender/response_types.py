@@ -77,3 +77,9 @@ class AuditLog(TypedDict):
     event: str
     author: Author
     target: Target
+
+class ServerInfo(TypedDict):
+    url: str
+    name: str
+    logon_url: str
+    upload_chunk_size: int
