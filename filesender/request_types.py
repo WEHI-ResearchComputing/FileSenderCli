@@ -49,12 +49,24 @@ class TransferUpdate(TypedDict):
 class FileUpdate(TypedDict):
     complete: NotRequired[bool]
 
+class GuestOptions(TypedDict, total=False):
+    valid_only_one_time: bool
+    can_only_send_to_me: bool
+    email_upload_started: bool
+    email_upload_page_access: bool
+    email_guest_created: bool
+    email_guest_created_receipt: bool
+    email_guest_expired: bool
+
+class GuestAllOptions(TypedDict):
+    guest: NotRequired[GuestOptions]
+    transfer: NotRequired[TransferOptions]
+
 Guest = TypedDict("Guest", {
     "recipient": str,
     "from": str,
     "subject": NotRequired[str],
     "message": NotRequired[str],
-    "options": NotRequired[List[str]],
-    "transfer_options": NotRequired[List[str]],
+    "options": NotRequired[GuestAllOptions],
     "expires": NotRequired[int]
 })

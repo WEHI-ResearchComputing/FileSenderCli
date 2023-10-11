@@ -1,7 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, List, Set, cast
+from typing import List, Set
 from typing_extensions import Annotated
-from urllib.parse import parse_qs, urlparse
 from bs4 import BeautifulSoup
 
 import requests
@@ -64,7 +63,12 @@ def invite(
     )
     print(client.create_guest({
         "from": username,
-        "recipient": recipient
+        "recipient": recipient,
+        "options": {
+            "guest": {
+                "can_only_send_to_me": True,
+            }
+        }
     }))
 
 @app.command(context_settings=context)
