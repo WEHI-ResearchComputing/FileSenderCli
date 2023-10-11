@@ -2,13 +2,11 @@ from dataclasses import dataclass
 import hashlib
 import hmac
 import time
-from requests import HTTPError, Request, Response, Session
+from requests import Request, Session
 from urllib.parse import urlparse, urlunparse, unquote
 from io import IOBase
-from typing import Any, Optional, TypeVar
+from typing import Optional, TypeVar
 from bs4 import BeautifulSoup
-
-
 
 SignType = TypeVar("SignType", bound=Request)
 class Auth:
