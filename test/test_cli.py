@@ -6,6 +6,10 @@ from os import remove
 runner = CliRunner()
 
 def test_large_upload(base_url, username, apikey, recipient):
+    """
+    This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
+    but also the multithreaded uploading
+    """
     with tempfile.NamedTemporaryFile("wb", delete=False) as file:
         # Make a 1 GB file
         file.truncate(1024 ** 3)

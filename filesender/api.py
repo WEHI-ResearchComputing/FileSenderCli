@@ -1,15 +1,17 @@
 from dataclasses import dataclass
+from time import sleep
 from typing import Any, List, Optional, Iterator, Tuple
 import requests
 import filesender.response_types as response
 import filesender.request_types as request
-from requests import Request, Response, HTTPError
+from requests import PreparedRequest, Request, Response, HTTPError
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from shutil import copyfileobj
 from pathlib import Path
 from io import IOBase
-from concurrent.futures import Executor, ThreadPoolExecutor, ProcessPoolExecutor, wait
+from concurrent.futures import Executor, Future, ThreadPoolExecutor, as_completed, wait
+from itertools import islice
 
 def url_without_scheme(url: str) -> str:
     """
@@ -55,7 +57,7 @@ class FileSenderClient:
     auth: Auth
     # Session to use for all HTTP requests
     session: requests.Session
-    executor: Executor
+    executor: ThreadPoolExecutor
 
     def __init__(
         self,
@@ -68,7 +70,7 @@ class FileSenderClient:
         self.base_url = base_url
         self.auth = auth
         self.session = session
-        self.executor = ProcessPoolExecutor(max_workers=threads)
+        self.executor = ThreadPoolExecutor(max_workers=threads)
         
         info = self.get_server_info()
         if chunk_size is None:
@@ -123,19 +125,29 @@ class FileSenderClient:
         self,
         file_info: response.File,
         file: IOBase
-    ):
+    ) -> None:
         """
         Uploads a file, with multiple chunks being uploaded in parallel
         """
-        futures = []
+        futures: List[Future] = []
         for chunk, offset in yield_chunks(file, self.chunk_size):
             request = self._upload_chunk_request(
                 chunk=chunk,
                 offset=offset,
                 file_info=file_info
             ).prepare()
-            futures.append(self.executor.submit(self.session.send, request))
-        return wait(futures)
+            # Keep adding to the queue until we have n jobs running
+            if len(futures) < self.executor._max_workers:
+                futures.append(self.executor.submit(self.session.send, request))
+            else:
+                # Once we reach a full queue, only add new futures as previous ones finish.
+                # This prevents the entire file being read into memory
+                for future in as_completed(futures):
+                    i = futures.index(future)
+                    futures[i] = self.executor.submit(self.session.send, request)
+                    break
+        # Once we've submitted everything, wait for the remaining tasks to finish
+        wait(futures)
 
     def _upload_chunk_request(
         self,
@@ -155,14 +167,6 @@ class FileSenderClient:
             },
         ), self.session)
 
-    def upload_chunk(
-        self,
-        file_info: response.File,
-        offset: int,
-        chunk: bytes,
-    ) -> response.File:
-        return self.sign_send()
-        
     def create_guest(
         self,
         body: request.Guest
@@ -176,7 +180,7 @@ class FileSenderClient:
     def download_file(
         self,
         token: str,
-        file_id: str,
+        file_id: int,
         out_dir: Path
     ):
         download_endpoint = urlunparse(urlparse(self.base_url)._replace(path="/download.php"))
@@ -202,7 +206,7 @@ class FileSenderClient:
     def upload_workflow(
         self,
         files: List[Path],
-        transfer_args: request.PartialTransfer
+        transfer_args: request.PartialTransfer = {}
     ) -> response.Transfer:
         """
         Reusable function for uploading one or more files
@@ -226,10 +230,10 @@ class FileSenderClient:
         for file in transfer["files"]:
             with files_by_name[file["name"]].open("rb") as fp:
                 # list forces the processing to occur
-                list(self.upload_file(
+                self.upload_file(
                     file_info=file,
                     file=fp
-                ))
+                )
                 self.update_file(
                     file_id=file["id"],
                     body={"complete": True}

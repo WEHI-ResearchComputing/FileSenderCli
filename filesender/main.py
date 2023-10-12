@@ -13,6 +13,7 @@ from filesender.config import get_defaults
 
 ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
 Threads = Annotated[int, Option(help="The maximum number of threads to use for concurrently uploading files")]
+Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
 
 context = {
     "default_map": get_defaults()
@@ -33,7 +34,8 @@ def invite(
     username: Annotated[str, Option(help="Your username. This is the username of the person doing the inviting, not the person being invited.")],
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
-    context: Context
+    context: Context,
+    verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False
 ):
     """
     Invites a user to send files to you
@@ -45,7 +47,7 @@ def invite(
         ),
         base_url=context.obj["base_url"]
     )
-    print(client.create_guest({
+    result = client.create_guest({
         "from": username,
         "recipient": recipient,
         "options": {
@@ -53,7 +55,10 @@ def invite(
                 "can_only_send_to_me": True,
             }
         }
-    }))
+    })
+    if verbose:
+        print(result)
+    print("Invitation successfully sent")
 
 @app.command(context_settings=context)
 def upload_voucher(
@@ -63,6 +68,7 @@ def upload_voucher(
     context: Context,
     threads: Threads = 1,
     chunk_size: ChunkSize = None,
+    verbose: Verbose = False
 ):
     """
     Uploads files to a voucher that you have been invited to
@@ -75,7 +81,10 @@ def upload_voucher(
         threads=threads
     )
     auth.prepare(client.session)
-    print(client.upload_workflow(files, {"from": email, "recipients": []}))
+    result = client.upload_workflow(files, {"from": email, "recipients": []})
+    if verbose:
+        print(result)
+    print("Upload completed successfully")
 
 @app.command(context_settings=context)
 def upload(
@@ -85,6 +94,7 @@ def upload(
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
     threads: Threads = 1,
+    verbose: Verbose = False
 ):
     """
     Sends files to an email of choice
@@ -97,7 +107,10 @@ def upload(
         base_url=context.obj["base_url"],
         threads=threads
     )
-    print(client.upload_workflow(files, {"recipients": recipients, "from": username}))
+    result = client.upload_workflow(files, {"recipients": recipients, "from": username})
+    if verbose:
+        print(result)
+    print("Upload completed successfully")
 
 @app.command(context_settings=context)
 def download(
@@ -111,16 +124,16 @@ def download(
         auth=Auth(),
         base_url=context.obj["base_url"]
     )
-    with ThreadPoolExecutor(max_workers=threads) as executor:
-        for file in files_from_token(token, client.session):
-            executor.submit(
-                client.download_file,
-                token=token,
-                file_id=file,
-                out_dir=out_dir
-            )
+    for file in files_from_token(token, client.session):
+        client.executor.submit(
+            client.download_file,
+            token=token,
+            file_id=file,
+            out_dir=out_dir
+        )
+    print(f"Download completed successfully. Files can be found in {out_dir}")
 
-def files_from_token(token: str, session: requests.Session) -> Set[str]:
+def files_from_token(token: str, session: requests.Session) -> Set[int]:
     download_page = session.get(
         "https://filesender.aarnet.edu.au",
         params = {
@@ -130,7 +143,7 @@ def files_from_token(token: str, session: requests.Session) -> Set[str]:
     )
     files = set()
     for file in BeautifulSoup(download_page.content, "html.parser").find_all(class_="file"):
-        files.add(file.attrs["data-id"])
+        files.add(int(file.attrs["data-id"]))
     return files
 
 if __name__ == "__main__":
