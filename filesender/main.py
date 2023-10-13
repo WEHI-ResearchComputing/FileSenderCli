@@ -1,5 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
-from typing import List, Set
+from typing import List, Optional, Set
 from typing_extensions import Annotated
 from bs4 import BeautifulSoup
 
@@ -8,32 +7,17 @@ from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context
 from rich import print
 from pathlib import Path
-from configparser import ConfigParser
 from filesender.auth import Auth, UserAuth, GuestAuth
-from filesender.request_types import PartialTransfer
+from filesender.config import get_defaults
 
-def get_defaults() -> dict:
-    defaults = {}
-    path = Path.home() / ".filesender" / "filesender.py.ini"
-    if path.exists():
-        parser = ConfigParser()
-        parser.read(path)
-        if parser.has_option("system", "base_url"):
-            defaults["base_url"] = parser.get("system", "base_url")
-        if parser.has_option("system", "default_transfer_days_valid"):
-            defaults["default_transfer_days_valid"] = parser.get("system", "default_transfer_days_valid")
-        if parser.has_option("user", "username"):
-            defaults["username"] = parser.get("user", "username")
-        if parser.has_option("user", "apikey"):
-            defaults["apikey"] = parser.get("user", "apikey")
-
-    return defaults
+ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
+Threads = Annotated[int, Option(help="The maximum number of threads to use for concurrently uploading files")]
+Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
 
 context = {
     "default_map": get_defaults()
 }
 app = Typer(name="filesender")
-
 
 @app.callback(context_settings=context)
 def common_args(
@@ -49,7 +33,8 @@ def invite(
     username: Annotated[str, Option(help="Your username. This is the username of the person doing the inviting, not the person being invited.")],
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
-    context: Context
+    context: Context,
+    verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False
 ):
     """
     Invites a user to send files to you
@@ -61,7 +46,7 @@ def invite(
         ),
         base_url=context.obj["base_url"]
     )
-    print(client.create_guest({
+    result = client.create_guest({
         "from": username,
         "recipient": recipient,
         "options": {
@@ -69,14 +54,20 @@ def invite(
                 "can_only_send_to_me": True,
             }
         }
-    }))
+    })
+    if verbose:
+        print(result)
+    print("Invitation successfully sent")
 
 @app.command(context_settings=context)
 def upload_voucher(
     files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
-    context: Context
+    context: Context,
+    threads: Threads = 1,
+    chunk_size: ChunkSize = None,
+    verbose: Verbose = False
 ):
     """
     Uploads files to a voucher that you have been invited to
@@ -84,10 +75,15 @@ def upload_voucher(
     auth = GuestAuth(guest_token=guest_token)
     client = FileSenderClient(
         auth=auth,
-        base_url=context.obj["base_url"]
+        base_url=context.obj["base_url"],
+        chunk_size = chunk_size,
+        threads=threads
     )
     auth.prepare(client.session)
-    upload_workflow(client, files, {"from": email, "recipients": []})
+    result = client.upload_workflow(files, {"from": email, "recipients": []})
+    if verbose:
+        print(result)
+    print("Upload completed successfully")
 
 @app.command(context_settings=context)
 def upload(
@@ -95,7 +91,9 @@ def upload(
     apikey: Annotated[str, Option(help="API token of the user performing the upload")],
     files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
-    context: Context
+    context: Context,
+    threads: Threads = 1,
+    verbose: Verbose = False
 ):
     """
     Sends files to an email of choice
@@ -105,51 +103,13 @@ def upload(
             api_key=apikey,
             username=username
         ),
-        base_url=context.obj["base_url"]
+        base_url=context.obj["base_url"],
+        threads=threads
     )
-    upload_workflow(client, files, {"recipients": recipients, "from": username})
-
-def upload_workflow(
-    client: FileSenderClient,
-    files: List[Path],
-    transfer_args: PartialTransfer
-):
-    """
-    Reusable function for uploading one or more files
-    Args:
-        transfer_args: Additional options to include when creating the transfer, for example a subject or message
-    """
-    files_by_name = {
-        path.name: path for path in files
-    }
-    transfer = client.create_transfer({
-        "files": [{
-            "name": file.name,
-            "size": file.stat().st_size
-        } for file in files],
-        "options": {
-            "email_download_complete": True,
-        },
-        **transfer_args
-    })
-    client.session.params["roundtriptoken"] = transfer["roundtriptoken"]
-    for file in transfer["files"]:
-        with files_by_name[file["name"]].open("rb") as fp:
-            client.upload_chunk(
-                file_id=file["id"],
-                chunk=fp,
-                offset=0
-            )
-            client.update_file(
-                file_id=file["id"],
-                body={"complete": True}
-            )
-
-    transfer = client.update_transfer(
-        transfer_id=transfer["id"],
-        body={"complete": True}
-    )
-    print(transfer)
+    result = client.upload_workflow(files, {"recipients": recipients, "from": username})
+    if verbose:
+        print(result)
+    print("Upload completed successfully")
 
 @app.command(context_settings=context)
 def download(
@@ -163,16 +123,16 @@ def download(
         auth=Auth(),
         base_url=context.obj["base_url"]
     )
-    with ThreadPoolExecutor(max_workers=threads) as executor:
-        for file in files_from_token(token, client.session):
-            executor.submit(
-                client.download_file,
-                token=token,
-                file_id=file,
-                out_dir=out_dir
-            )
+    for file in files_from_token(token, client.session):
+        client.executor.submit(
+            client.download_file,
+            token=token,
+            file_id=file,
+            out_dir=out_dir
+        )
+    print(f"Download completed successfully. Files can be found in {out_dir}")
 
-def files_from_token(token: str, session: requests.Session) -> Set[str]:
+def files_from_token(token: str, session: requests.Session) -> Set[int]:
     download_page = session.get(
         "https://filesender.aarnet.edu.au",
         params = {
@@ -182,7 +142,7 @@ def files_from_token(token: str, session: requests.Session) -> Set[str]:
     )
     files = set()
     for file in BeautifulSoup(download_page.content, "html.parser").find_all(class_="file"):
-        files.add(file.attrs["data-id"])
+        files.add(int(file.attrs["data-id"]))
     return files
 
 if __name__ == "__main__":
