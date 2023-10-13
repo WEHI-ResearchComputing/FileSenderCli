@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional, Set
 from typing_extensions import Annotated
 from bs4 import BeautifulSoup

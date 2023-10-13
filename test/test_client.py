@@ -2,6 +2,7 @@ import tempfile
 from filesender.api import FileSenderClient
 from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
+from time import sleep
 
 def test_voucher_round_trip(base_url, username, apikey, recipient):
     """
@@ -23,10 +24,13 @@ def test_voucher_round_trip(base_url, username, apikey, recipient):
         "from": username
     })
 
+    guest_auth = GuestAuth(guest_token=guest["token"])
     guest_client = FileSenderClient(
         base_url=base_url,
-        auth=GuestAuth(guest_token=guest["token"])
+        auth=guest_auth,
+        threads=1
     )
+    guest_auth.prepare(guest_client.session)
 
     with tempfile.NamedTemporaryFile("wb", delete=False) as file:
         path = Path(file.name)
@@ -36,9 +40,11 @@ def test_voucher_round_trip(base_url, username, apikey, recipient):
 
         # The guest uploads the file
         transfer = guest_client.upload_workflow(
-            files=[path]
+            files=[path],
+            transfer_args={
+                "recipients": [username]
+            }
         )
-
         path.unlink()
     
     with tempfile.TemporaryDirectory() as download_dir:

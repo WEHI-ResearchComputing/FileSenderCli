@@ -129,25 +129,34 @@ class FileSenderClient:
         """
         Uploads a file, with multiple chunks being uploaded in parallel
         """
-        futures: List[Future] = []
+        queue: List[Future[Response]] = []
         for chunk, offset in yield_chunks(file, self.chunk_size):
-            request = self._upload_chunk_request(
-                chunk=chunk,
-                offset=offset,
-                file_info=file_info
-            ).prepare()
+            request = self.session.prepare_request(
+                self.auth.sign(
+                    self._upload_chunk_request(
+                        chunk=chunk,
+                        offset=offset,
+                        file_info=file_info
+                    ),
+                    self.session
+                )
+            )
+
+            fut = self.executor.submit(self.session.send, request)
             # Keep adding to the queue until we have n jobs running
-            if len(futures) < self.executor._max_workers:
-                futures.append(self.executor.submit(self.session.send, request))
+            if len(queue) < self.executor._max_workers:
+                queue.append(fut)
             else:
                 # Once we reach a full queue, only add new futures as previous ones finish.
                 # This prevents the entire file being read into memory
-                for future in as_completed(futures):
-                    i = futures.index(future)
-                    futures[i] = self.executor.submit(self.session.send, request)
+                for future in as_completed(queue):
+                    raise_status(future.result())
+                    i = queue.index(future)
+                    queue[i] = fut
                     break
+        
         # Once we've submitted everything, wait for the remaining tasks to finish
-        wait(futures)
+        wait(queue)
 
     def _upload_chunk_request(
         self,
