@@ -1,17 +1,15 @@
 from dataclasses import dataclass
-from time import sleep
 from typing import Any, List, Optional, Iterator, Tuple
 import requests
 import filesender.response_types as response
 import filesender.request_types as request
-from requests import PreparedRequest, Request, Response, HTTPError
+from requests import Request, Response, HTTPError
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from shutil import copyfileobj
 from pathlib import Path
 from io import IOBase
-from concurrent.futures import Executor, Future, ThreadPoolExecutor, as_completed, wait
-from itertools import islice
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 
 def url_without_scheme(url: str) -> str:
     """
@@ -30,7 +28,10 @@ def raise_status(response: Response):
     try:
         response.raise_for_status()
     except HTTPError as e:
-        raise Exception(f"Request failed with content {e.response.json()}") from e
+        if e.request:
+            raise Exception(f"Request failed with content {e.response.json()} for request {e.request.method} {e.request.url}") from e
+        else:
+            raise e
 
 def yield_chunks(file: IOBase, chunk_size: int) -> Iterator[Tuple[bytes, int]]:
     """
@@ -112,12 +113,15 @@ class FileSenderClient:
 
     def update_file(
         self,
-        file_id: int,
+        file_info: response.File,
         body: request.FileUpdate,
     ):
         return self.sign_send(Request(
             "PUT",
-            f"{self.base_url}/file/{file_id}",
+            f"{self.base_url}/file/{file_info['id']}",
+            params={
+                "key": file_info["uid"]
+            },
             json=body,
         ))
 
@@ -132,13 +136,10 @@ class FileSenderClient:
         queue: List[Future[Response]] = []
         for chunk, offset in yield_chunks(file, self.chunk_size):
             request = self.session.prepare_request(
-                self.auth.sign(
-                    self._upload_chunk_request(
-                        chunk=chunk,
-                        offset=offset,
-                        file_info=file_info
-                    ),
-                    self.session
+                self._upload_chunk_request(
+                    chunk=chunk,
+                    offset=offset,
+                    file_info=file_info
                 )
             )
 
@@ -156,7 +157,8 @@ class FileSenderClient:
                     break
         
         # Once we've submitted everything, wait for the remaining tasks to finish
-        wait(queue)
+        for future in as_completed(queue):
+            raise_status(future.result())
 
     def _upload_chunk_request(
         self,
@@ -167,6 +169,9 @@ class FileSenderClient:
         return self.auth.sign(Request(
             "PUT",
             f"{self.base_url}/file/{file_info['id']}/chunk/{offset}",
+            params={
+                "key": file_info["uid"]
+            },
             data=chunk,
             headers={
                 "Content-Type": 'application/octet-stream',
@@ -244,7 +249,7 @@ class FileSenderClient:
                     file=fp
                 )
                 self.update_file(
-                    file_id=file["id"],
+                    file_info=file,
                     body={"complete": True}
                 )
 

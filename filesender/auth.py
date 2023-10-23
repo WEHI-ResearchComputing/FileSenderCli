@@ -5,7 +5,7 @@ import time
 from requests import Request, Session
 from urllib.parse import urlparse, urlunparse, unquote
 from io import IOBase
-from typing import Optional, TypeVar
+from typing import Optional, TypeVar, Dict, cast
 from bs4 import BeautifulSoup
 
 SignType = TypeVar("SignType", bound=Request)
@@ -31,14 +31,14 @@ class UserAuth(Auth):
     def sign(self, request: SignType, session: Session) -> SignType:
         # We have to sort the params alphabetically for calculating
         # the signature
-        request.params = dict(sorted(dict(
-            remote_user = self.username,
-            timestamp = str(round(time.time())),
+        request.params = dict(sorted({
+            "remote_user": self.username,
+            "timestamp": str(round(time.time())),
             # Manually add the session params so we can force them to be
             # alphabetical order
-            **session.params,
+            **cast(Dict[str, str], session.params),
             **request.params
-        ).items()))
+        }.items()))
         
         signature = hmac.new(
             key=self.api_key.encode(),
