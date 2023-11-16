@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-pip install https://github.com/WEHI-ResearchComputing/FileSenderCli.git
+pip install git+https://github.com/WEHI-ResearchComputing/FileSenderCli.git
 ```
 
 ## Usage
