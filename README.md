@@ -2,6 +2,8 @@
 
 ## Installation
 
+Requires `Python>=3.8`
+
 ```bash
 pip install git+https://github.com/WEHI-ResearchComputing/FileSenderCli.git
 ```
