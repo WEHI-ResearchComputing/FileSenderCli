@@ -93,7 +93,8 @@ def upload(
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
     threads: Threads = 1,
-    verbose: Verbose = False
+    verbose: Verbose = False,
+    chunk_size: ChunkSize = None
 ):
     """
     Sends files to an email of choice
@@ -104,7 +105,8 @@ def upload(
             username=username
         ),
         base_url=context.obj["base_url"],
-        threads=threads
+        threads=threads,
+        chunk_size=chunk_size
     )
     result = client.upload_workflow(files, {"recipients": recipients, "from": username})
     if verbose:
