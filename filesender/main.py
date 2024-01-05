@@ -13,6 +13,7 @@ from filesender.config import get_defaults
 ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
 Threads = Annotated[int, Option(help="The maximum number of threads to use for concurrently uploading files")]
 Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
+Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. Increase this value if you have a slow connection. This value should be approximately the time it takes you to upload one chunk to the server.", metavar="N")]
 
 context = {
     "default_map": get_defaults()
@@ -34,7 +35,8 @@ def invite(
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
     context: Context,
-    verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False
+    verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False,
+    delay: Delay = 0
 ):
     """
     Invites a user to send files to you
@@ -42,7 +44,8 @@ def invite(
     client = FileSenderClient(
         auth=UserAuth(
             api_key=apikey,
-            username=username
+            username=username,
+            delay=delay
         ),
         base_url=context.obj["base_url"]
     )
@@ -94,7 +97,8 @@ def upload(
     context: Context,
     threads: Threads = 1,
     verbose: Verbose = False,
-    chunk_size: ChunkSize = None
+    chunk_size: ChunkSize = None,
+    delay: Delay = 0
 ):
     """
     Sends files to an email of choice
@@ -102,7 +106,8 @@ def upload(
     client = FileSenderClient(
         auth=UserAuth(
             api_key=apikey,
-            username=username
+            username=username,
+            delay=delay
         ),
         base_url=context.obj["base_url"],
         threads=threads,
@@ -123,7 +128,8 @@ def download(
     """Downloads all files associated with a transfer"""
     client = FileSenderClient(
         auth=Auth(),
-        base_url=context.obj["base_url"]
+        base_url=context.obj["base_url"],
+        threads=threads
     )
     for file in files_from_token(token, client.session):
         client.executor.submit(

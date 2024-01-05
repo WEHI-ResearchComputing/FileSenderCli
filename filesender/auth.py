@@ -27,13 +27,16 @@ def url_without_scheme(url: str) -> str:
 class UserAuth(Auth):
     username: str
     api_key: str
+    #: The number of seconds to delay the timestamp.
+    #: See https://docs.filesender.org/filesender/v2.0/rest/#signed-request
+    delay: int = 0
 
     def sign(self, request: SignType, session: Session) -> SignType:
         # We have to sort the params alphabetically for calculating
         # the signature
         request.params = dict(sorted({
             "remote_user": self.username,
-            "timestamp": str(round(time.time())),
+            "timestamp": str(round(time.time() + self.delay)),
             # Manually add the session params so we can force them to be
             # alphabetical order
             **cast(Dict[str, str], session.params),

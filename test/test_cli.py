@@ -5,7 +5,7 @@ from os import remove
 
 runner = CliRunner()
 
-def test_large_upload(base_url, username, apikey, recipient):
+def test_large_upload(base_url: str, username: str, apikey: str, recipient: str, delay: int):
     """
     This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
@@ -21,6 +21,7 @@ def test_large_upload(base_url, username, apikey, recipient):
             "--username", username,
             "--apikey", apikey,
             "--recipients", recipient,
+            "--delay", str(delay),
             "--threads", "8"
         ], catch_exceptions=False)
         if result.exit_code != 0:
