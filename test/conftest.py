@@ -5,6 +5,7 @@ def pytest_addoption(parser: Parser):
     parser.addoption("--base-url", required=True)
     parser.addoption("--apikey", required=True)
     parser.addoption("--username", required=True)
+    parser.addoption("--delay", required=False, default="0")
     parser.addoption("--recipient", help="Email address that will be used as the recipient of the invitations", required=True)
 
 def pytest_generate_tests(metafunc: Metafunc):
