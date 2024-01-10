@@ -86,5 +86,5 @@ class GuestAuth(Auth):
         if self.security_token is None or self.csrf_token is None:
             raise Exception(".prepare() must be called on the GuestAuth before it is used to sign requests")
         request.headers["X-Filesender-Security-Token"] = self.security_token
-        # request.headers["Csrfptoken"] = self.csrf_token
+        request.headers["Csrfptoken"] = self.csrf_token
         return request
