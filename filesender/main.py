@@ -1,14 +1,23 @@
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Callable
 from typing_extensions import Annotated
 from bs4 import BeautifulSoup
-
-import requests
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context
 from rich import print
 from pathlib import Path
 from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
+from functools import wraps
+from asyncio import run
+from httpx import AsyncClient
+
+def typer_async(f: Callable):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return run(f(*args, **kwargs))
+
+    return wrapper
+
 
 ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
 Threads = Annotated[int, Option(help="The maximum number of threads to use for concurrently uploading files")]
@@ -63,7 +72,8 @@ def invite(
     print("Invitation successfully sent")
 
 @app.command(context_settings=context)
-def upload_voucher(
+@typer_async
+async def upload_voucher(
     files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
@@ -82,14 +92,16 @@ def upload_voucher(
         chunk_size = chunk_size,
         threads=threads
     )
-    auth.prepare(client.session)
-    result = client.upload_workflow(files, {"from": email, "recipients": []})
+    await auth.prepare(client.http_client)
+    await client.prepare()
+    result = await client.upload_workflow(files, {"from": email, "recipients": []})
     if verbose:
         print(result)
     print("Upload completed successfully")
 
 @app.command(context_settings=context)
-def upload(
+@typer_async
+async def upload(
     username: Annotated[str, Option(help="Username of the user performing the upload")],
     apikey: Annotated[str, Option(help="API token of the user performing the upload")],
     files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
@@ -113,7 +125,8 @@ def upload(
         threads=threads,
         chunk_size=chunk_size
     )
-    result = client.upload_workflow(files, {"recipients": recipients, "from": username})
+    await client.prepare()
+    result = await client.upload_workflow(files, {"recipients": recipients, "from": username})
     if verbose:
         print(result)
     print("Upload completed successfully")
@@ -131,27 +144,11 @@ def download(
         base_url=context.obj["base_url"],
         threads=threads
     )
-    for file in files_from_token(token, client.session):
-        client.executor.submit(
-            client.download_file,
-            token=token,
-            file_id=file,
-            out_dir=out_dir
-        )
+    run(client.download_files(
+        token=token,
+        out_dir=out_dir
+    ))
     print(f"Download completed successfully. Files can be found in {out_dir}")
-
-def files_from_token(token: str, session: requests.Session) -> Set[int]:
-    download_page = session.get(
-        "https://filesender.aarnet.edu.au",
-        params = {
-            "s": "download",
-            "token": token
-        }
-    )
-    files = set()
-    for file in BeautifulSoup(download_page.content, "html.parser").find_all(class_="file"):
-        files.add(int(file.attrs["data-id"]))
-    return files
 
 if __name__ == "__main__":
     app()
