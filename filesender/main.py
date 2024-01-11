@@ -61,15 +61,13 @@ def invite(
         "from": username,
         "recipient": recipient,
         "options": {
-            "guest": {
-                "valid_only_one_time": one_time,
-                "can_only_send_to_me": only_to_me,
-                "email_upload_started": email_upload_started,
-                "email_upload_page_access": email_page_access,
-                "email_guest_created": email_guest_created,
-                "email_guest_created_receipt": email_receipt,
-                "email_guest_expired": email_guest_expired
-            }
+            "valid_only_one_time": one_time,
+            "can_only_send_to_me": only_to_me,
+            "email_upload_started": email_upload_started,
+            "email_upload_page_access": email_page_access,
+            "email_guest_created": email_guest_created,
+            "email_guest_created_receipt": email_receipt,
+            "email_guest_expired": email_guest_expired
         }
     })
     if verbose:

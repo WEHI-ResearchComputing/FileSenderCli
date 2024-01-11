@@ -67,6 +67,7 @@ Guest = TypedDict("Guest", {
     "from": str,
     "subject": NotRequired[str],
     "message": NotRequired[str],
-    "options": NotRequired[GuestAllOptions],
+    "options": NotRequired[GuestOptions],
+    "transfer_options": NotRequired[TransferOptions],
     "expires": NotRequired[int]
 })
