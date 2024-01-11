@@ -1,17 +1,14 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional, Iterator, Tuple, AsyncIterator
+from typing import Any, List, Optional, Tuple, AsyncIterator
 
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
-from shutil import copyfileobj
 from pathlib import Path
-from io import IOBase
-from concurrent.futures import ThreadPoolExecutor
-from httpx import Request, Response, RequestError, AsyncClient, HTTPStatusError
-from asyncio import TaskGroup, run
+from httpx import Request, Response, AsyncClient, HTTPStatusError
+from asyncio import TaskGroup
 import aiofiles
 
 def url_without_scheme(url: str) -> str:
@@ -62,7 +59,6 @@ class FileSenderClient:
     auth: Auth
     # Session to use for all HTTP requests
     http_client: AsyncClient
-    executor: ThreadPoolExecutor
 
     def __init__(
         self,
@@ -74,7 +70,6 @@ class FileSenderClient:
         self.base_url = base_url
         self.auth = auth
         self.http_client = AsyncClient()
-        self.executor = ThreadPoolExecutor(max_workers=threads)
         self.chunk_size = chunk_size
 
     async def prepare(self):
@@ -100,7 +95,7 @@ class FileSenderClient:
         self,
         body: request.Transfer,
     ) -> response.Transfer:
-        return await self.sign_send(Request(
+        return await self.sign_send(self.http_client.build_request(
             "POST",
             f"{self.base_url}/transfer",
             json=body,
@@ -111,7 +106,7 @@ class FileSenderClient:
         transfer_id: int,
         body: request.TransferUpdate,
     ) -> response.Transfer:
-        return await self.sign_send(Request(
+        return await self.sign_send(self.http_client.build_request(
             "PUT",
             f"{self.base_url}/transfer/{transfer_id}",
             json=body,
@@ -122,7 +117,7 @@ class FileSenderClient:
         file_info: response.File,
         body: request.FileUpdate,
     ) -> Any:
-        return await self.sign_send(Request(
+        return await self.sign_send(self.http_client.build_request(
             "PUT",
             f"{self.base_url}/file/{file_info['id']}",
             params={
@@ -159,7 +154,7 @@ class FileSenderClient:
         offset: int,
         chunk: bytes,
     ) -> Request:
-        return await self.sign_send(Request(
+        return await self.sign_send(self.http_client.build_request(
             "PUT",
             f"{self.base_url}/file/{file_info['id']}/chunk/{offset}",
             params={
@@ -178,7 +173,7 @@ class FileSenderClient:
         self,
         body: request.Guest
     ) -> response.Guest:
-        return await self.sign_send(Request(
+        return await self.sign_send(self.http_client.build_request(
             "POST",
             f"{self.base_url}/guest",
             json=body

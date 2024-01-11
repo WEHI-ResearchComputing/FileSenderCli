@@ -1,6 +1,5 @@
-from typing import List, Optional, Set, Callable
+from typing import List, Optional, Callable
 from typing_extensions import Annotated
-from bs4 import BeautifulSoup
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context
 from rich import print
@@ -9,7 +8,6 @@ from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
 from functools import wraps
 from asyncio import run
-from httpx import AsyncClient
 
 def typer_async(f: Callable):
     @wraps(f)

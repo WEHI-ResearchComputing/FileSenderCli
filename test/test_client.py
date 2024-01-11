@@ -55,7 +55,6 @@ async def test_voucher_round_trip(base_url: str, username: str, apikey: str, rec
     This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-
     user_client = FileSenderClient(
         base_url=base_url,
         auth=UserAuth(
