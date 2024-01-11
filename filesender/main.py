@@ -1,7 +1,6 @@
 from typing import List, Optional, Set
 from typing_extensions import Annotated
 from bs4 import BeautifulSoup
-
 import requests
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context
@@ -36,6 +35,15 @@ def invite(
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
     context: Context,
     verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False,
+    # Although these parameters are exact duplicates of those in GuestOptions,
+    # typer doesn't support re-using argument lists: https://github.com/tiangolo/typer/discussions/665
+    one_time: Annotated[bool, Option(help="If true, this voucher is only valid for one use, otherwise it can be re-used.")] = True,
+    only_to_me: Annotated[bool, Option(help="If true, this voucher can only be used to send files to you, the person who created this voucher. Otherwise they can send files to any email address.")] = True,
+    email_upload_started: Annotated[bool, Option(help="If true, an email will be sent to you, when an upload to this voucher starts.")] = False,
+    email_page_access: Annotated[bool, Option(help="If true, an email will be sent to you when the guest recipient accesses the upload page.")] = False,
+    email_guest_created: Annotated[bool, Option(help="If true, send an email to the guest user who is being invited to upload.")] = True,
+    email_receipt: Annotated[bool, Option(help="If true, send you an email when the guest account is created.")] = True,
+    email_guest_expired: Annotated[bool, Option(help="If true, send you an email when the voucher expires.")] = False,
     delay: Delay = 0
 ):
     """
@@ -54,7 +62,13 @@ def invite(
         "recipient": recipient,
         "options": {
             "guest": {
-                "can_only_send_to_me": True,
+                "valid_only_one_time": one_time,
+                "can_only_send_to_me": only_to_me,
+                "email_upload_started": email_upload_started,
+                "email_upload_page_access": email_page_access,
+                "email_guest_created": email_guest_created,
+                "email_guest_created_receipt": email_receipt,
+                "email_guest_expired": email_guest_expired
             }
         }
     })

@@ -185,6 +185,7 @@ class FileSenderClient:
         self,
         body: request.Guest
     ) -> response.Guest:
+        """Sends a voucher to a guest to invite them to send files"""
         return self.sign_send(Request(
             "POST",
             f"{self.base_url}/guest",
