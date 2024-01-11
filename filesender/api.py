@@ -7,9 +7,10 @@ import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
-from httpx import Request, Response, AsyncClient, HTTPStatusError
+from httpx import Request, Response, AsyncClient, HTTPStatusError, RequestError
 from asyncio import TaskGroup
 import aiofiles
+from contextlib import contextmanager
 
 def url_without_scheme(url: str) -> str:
     """
@@ -20,18 +21,18 @@ def url_without_scheme(url: str) -> str:
     """
     return unquote(urlunparse(urlparse(url)._replace(scheme="")).lstrip("/"))
 
-def raise_status(response: Response):
+@contextmanager
+def raise_status():
     """
     Does nothing if the response was successful.
     If it failed, throws a user friendly error
     """
     try:
-        response.raise_for_status()
+        yield
     except HTTPStatusError as e:
-        if e.request:
-            raise Exception(f"Request failed with content {e.response.json()} for request {e.request.method} {e.request.url}") from e
-        else:
-            raise e
+        raise Exception(f"Request failed with content {e.response.json()} for request {e.request.method} {e.request.url}") from e
+    except RequestError as e:
+        raise Exception(f"Request failed for request {e.request.method} {e.request.url}") from e
 
 async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes, int]]:
     """
@@ -87,8 +88,9 @@ class FileSenderClient:
         Signs a request and sends it, returning the JSON result
         """
         self.auth.sign(request, self.http_client)
-        res = await self.http_client.send(request)
-        raise_status(res)
+        with raise_status():
+            res = await self.http_client.send(request)
+            res.raise_for_status()
         return res.json()
 
     async def create_transfer(
