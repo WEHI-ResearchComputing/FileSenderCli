@@ -4,6 +4,7 @@ from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
 from random import randbytes
 import pytest
+from filesender.request_types import GuestOptions
 
 @pytest.mark.asyncio
 async def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
@@ -50,6 +51,10 @@ async def test_round_trip(base_url: str, username: str, apikey: str, recipient: 
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("guest_opts", [
+    {},
+    {"can_only_send_to_me": False}
+])
 async def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient: str):
     """
     This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
@@ -73,7 +78,6 @@ async def test_voucher_round_trip(base_url: str, username: str, apikey: str, rec
     guest_client = FileSenderClient(
         base_url=base_url,
         auth=guest_auth,
-        threads=1
     )
     await guest_client.prepare()
     await guest_auth.prepare(guest_client.http_client)
@@ -101,3 +105,29 @@ async def test_voucher_round_trip(base_url: str, username: str, apikey: str, rec
             out_dir=Path(download_dir)
         )
         assert len(list(Path(download_dir).iterdir())) == 1
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("guest_opts", [
+    {},
+    {"can_only_send_to_me": False}
+])
+async def test_guest_creation(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
+    user_client = FileSenderClient(
+        base_url=base_url,
+        auth=UserAuth(
+            api_key=apikey,
+            username=username
+        )
+    )
+
+    # Invite the guest
+    guest = await user_client.create_guest({
+        "recipient": recipient,
+        "from": username,
+        "options": {
+            "guest": guest_opts
+        }
+    })
+
+    # Check that the options were acknowledged by the server 
+    assert len(guest["options"]) == len(guest_opts)

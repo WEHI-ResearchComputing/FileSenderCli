@@ -1,4 +1,4 @@
-from typing import List, Optional, Callable
+from typing import Any, List, Optional, Callable, ParamSpec, TypeVar, Awaitable, Coroutine
 from typing_extensions import Annotated
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context
@@ -9,9 +9,13 @@ from filesender.config import get_defaults
 from functools import wraps
 from asyncio import run
 
-def typer_async(f: Callable):
+from filesender.response_types import Guest, Transfer
+
+P = ParamSpec("P")
+T = TypeVar("T")
+def typer_async(f: Callable[P, Coroutine[Any, Any, T]]):
     @wraps(f)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         return run(f(*args, **kwargs))
 
     return wrapper
@@ -42,7 +46,16 @@ def invite(
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
     context: Context,
-    verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False,
+    verbose: Verbose,
+    # Although these parameters are exact duplicates of those in GuestOptions,
+    # typer doesn't support re-using argument lists: https://github.com/tiangolo/typer/discussions/665
+    one_time: Annotated[bool, Option(help="If true, this voucher is only valid for one use, otherwise it can be re-used.")] = True,
+    only_to_me: Annotated[bool, Option(help="If true, this voucher can only be used to send files to you, the person who created this voucher. Otherwise they can send files to any email address.")] = True,
+    email_upload_started: Annotated[bool, Option(help="If true, an email will be sent to you, when an upload to this voucher starts.")] = False,
+    email_page_access: Annotated[bool, Option(help="If true, an email will be sent to you when the guest recipient accesses the upload page.")] = False,
+    email_guest_created: Annotated[bool, Option(help="If true, send an email to the guest user who is being invited to upload.")] = True,
+    email_receipt: Annotated[bool, Option(help="If true, send you an email when the guest account is created.")] = True,
+    email_guest_expired: Annotated[bool, Option(help="If true, send you an email when the voucher expires.")] = False,
     delay: Delay = 0
 ):
     """
@@ -56,15 +69,24 @@ def invite(
         ),
         base_url=context.obj["base_url"]
     )
-    result = client.create_guest({
+    result: Guest = run(client.create_guest({
         "from": username,
         "recipient": recipient,
         "options": {
             "guest": {
-                "can_only_send_to_me": True,
+                "valid_only_one_time": one_time,
+                "can_only_send_to_me": only_to_me,
+                "email_upload_started": email_upload_started,
+                "email_upload_page_access": email_page_access,
+                "email_guest_created": email_guest_created,
+                "email_guest_created_receipt": email_receipt,
+                "email_guest_expired": email_guest_expired
+            },
+            "transfer": {
+                "add_me_to_recipients": False
             }
         }
-    })
+    }))
     if verbose:
         print(result)
     print("Invitation successfully sent")
@@ -76,7 +98,6 @@ async def upload_voucher(
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
     context: Context,
-    threads: Threads = 1,
     chunk_size: ChunkSize = None,
     verbose: Verbose = False
 ):
@@ -88,11 +109,10 @@ async def upload_voucher(
         auth=auth,
         base_url=context.obj["base_url"],
         chunk_size = chunk_size,
-        threads=threads
     )
     await auth.prepare(client.http_client)
     await client.prepare()
-    result = await client.upload_workflow(files, {"from": email, "recipients": []})
+    result: Transfer = await client.upload_workflow(files, {"from": email, "recipients": []})
     if verbose:
         print(result)
     print("Upload completed successfully")
@@ -105,7 +125,6 @@ async def upload(
     files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
-    threads: Threads = 1,
     verbose: Verbose = False,
     chunk_size: ChunkSize = None,
     delay: Delay = 0
@@ -120,11 +139,10 @@ async def upload(
             delay=delay
         ),
         base_url=context.obj["base_url"],
-        threads=threads,
         chunk_size=chunk_size
     )
     await client.prepare()
-    result = await client.upload_workflow(files, {"recipients": recipients, "from": username})
+    result: Transfer = await client.upload_workflow(files, {"recipients": recipients, "from": username})
     if verbose:
         print(result)
     print("Upload completed successfully")
@@ -134,13 +152,11 @@ def download(
     context: Context,
     token: Annotated[str, Argument(help='The part of the download URL after "token="')],
     out_dir: Annotated[Path, Option(dir_okay=True, file_okay=False, exists=True, help="Path to the directory to store the output files")] = Path.cwd(),
-    threads: Annotated[int, Option(help="Maximum number of threads to use to download the files concurrently")] = 1
 ):
     """Downloads all files associated with a transfer"""
     client = FileSenderClient(
         auth=Auth(),
         base_url=context.obj["base_url"],
-        threads=threads
     )
     run(client.download_files(
         token=token,

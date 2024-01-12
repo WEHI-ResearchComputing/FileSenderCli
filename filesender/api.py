@@ -7,7 +7,7 @@ import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
-from httpx import Request, Response, AsyncClient, HTTPStatusError, RequestError
+from httpx import Request, AsyncClient, HTTPStatusError, RequestError
 from asyncio import TaskGroup
 import aiofiles
 from contextlib import contextmanager
@@ -66,7 +66,6 @@ class FileSenderClient:
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        threads: int = 1
     ):
         self.base_url = base_url
         self.auth = auth
@@ -176,6 +175,7 @@ class FileSenderClient:
         body: request.Guest
     ) -> response.Guest:
         return await self.sign_send(self.http_client.build_request(
+        """Sends a voucher to a guest to invite them to send files"""
             "POST",
             f"{self.base_url}/guest",
             json=body
