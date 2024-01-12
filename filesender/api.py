@@ -68,7 +68,7 @@ class FileSenderClient:
     ):
         self.base_url = base_url
         self.auth = auth
-        self.http_client = AsyncClient()
+        self.http_client = AsyncClient(timeout=None)
         self.chunk_size = chunk_size
 
     async def prepare(self):
@@ -173,8 +173,8 @@ class FileSenderClient:
         self,
         body: request.Guest
     ) -> response.Guest:
-        return await self.sign_send(self.http_client.build_request(
         """Sends a voucher to a guest to invite them to send files"""
+        return await self.sign_send(self.http_client.build_request(
             "POST",
             f"{self.base_url}/guest",
             json=body

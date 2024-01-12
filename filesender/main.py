@@ -46,7 +46,7 @@ def invite(
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
     context: Context,
-    verbose: Verbose,
+    verbose: Verbose = False,
     # Although these parameters are exact duplicates of those in GuestOptions,
     # typer doesn't support re-using argument lists: https://github.com/tiangolo/typer/discussions/665
     one_time: Annotated[bool, Option(help="If true, this voucher is only valid for one use, otherwise it can be re-used.")] = True,

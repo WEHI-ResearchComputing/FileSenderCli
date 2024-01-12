@@ -55,7 +55,7 @@ async def test_round_trip(base_url: str, username: str, apikey: str, recipient: 
     {},
     {"can_only_send_to_me": False}
 ])
-async def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient: str):
+async def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
     """
     This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
@@ -71,7 +71,10 @@ async def test_voucher_round_trip(base_url: str, username: str, apikey: str, rec
     # Invite the guest
     guest = await user_client.create_guest({
         "recipient": recipient,
-        "from": username
+        "from": username,
+        "options": {
+            "guest": guest_opts
+        }
     })
 
     guest_auth = GuestAuth(guest_token=guest["token"])
