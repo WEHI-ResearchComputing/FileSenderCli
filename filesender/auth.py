@@ -7,6 +7,9 @@ from urllib.parse import urlparse, urlunparse, unquote
 from io import IOBase
 from typing import Optional, TypeVar, Dict, cast
 from bs4 import BeautifulSoup
+import logging
+
+logger = logging.getLogger(__name__)
 
 SignType = TypeVar("SignType", bound=Request)
 class Auth:
@@ -88,8 +91,13 @@ class GuestAuth(Auth):
             }
         )
         soup = BeautifulSoup(res.content, 'html.parser')
-        self.security_token = soup.find("body").attrs.get("data-security-token")
+        self.security_token = soup.find("body").attrs["data-security-token"]
         self.csrf_token = res.cookies.get("csrfptoken")
+        # We might already have the token, because we requested the server info earlier
+        if self.csrf_token is None and "csrfptoken" in session.cookies:
+            self.csrf_token = session.cookies._find("csrfptoken")
+        if self.csrf_token is None:
+            logger.warn("No CSRF token could be found!")
 
     def sign(self, request: SignType, session: Session) -> SignType:
         request.params["vid"] = self.guest_token

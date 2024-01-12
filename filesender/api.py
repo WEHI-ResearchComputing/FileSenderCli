@@ -65,12 +65,12 @@ class FileSenderClient:
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        session: requests.Session = requests.Session(),
+        session: Optional[requests.Session] = None,
         threads: int = 1
     ):
         self.base_url = base_url
         self.auth = auth
-        self.session = session
+        self.session = session or requests.Session()
         self.executor = ThreadPoolExecutor(max_workers=threads)
         
         info = self.get_server_info()
