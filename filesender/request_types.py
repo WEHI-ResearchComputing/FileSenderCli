@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import List
 from typing_extensions import TypedDict, NotRequired
 
 class File(TypedDict):

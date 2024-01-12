@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple, AsyncIterator
-
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request

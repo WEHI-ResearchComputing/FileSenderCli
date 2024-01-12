@@ -7,7 +7,6 @@ from urllib.parse import urlparse, urlunparse, unquote
 from typing import Optional, TypeVar
 from bs4 import BeautifulSoup
 from collections.abc import Iterable
-=======
 import logging
 
 logger = logging.getLogger(__name__)
