@@ -3,8 +3,35 @@ from filesender.api import FileSenderClient
 from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
 from random import randbytes
+import pytest
 
-def test_round_trip(base_url, username, apikey, recipient):
+from filesender.request_types import GuestOptions
+
+@pytest.mark.parametrize("guest_opts", [
+    {},
+    {"can_only_send_to_me": False}
+])
+def test_guest_creation(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
+    user_client = FileSenderClient(
+        base_url=base_url,
+        auth=UserAuth(
+            api_key=apikey,
+            username=username
+        )
+    )
+
+    # Invite the guest
+    guest = user_client.create_guest({
+        "recipient": recipient,
+        "from": username,
+        "options": {
+            "guest": guest_opts
+        }
+    })
+
+    assert len(guest["options"]) == len(guest_opts)
+
+def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
     """
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
@@ -46,7 +73,11 @@ def test_round_trip(base_url, username, apikey, recipient):
         assert len(list(Path(download_dir).iterdir())) == 1
 
 
-def test_voucher_round_trip(base_url, username, apikey, recipient):
+@pytest.mark.parametrize("guest_opts", [
+    {},
+    {"can_only_send_to_me": False}
+])
+def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
     """
     This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
@@ -63,7 +94,8 @@ def test_voucher_round_trip(base_url, username, apikey, recipient):
     # Invite the guest
     guest = user_client.create_guest({
         "recipient": recipient,
-        "from": username
+        "from": username,
+        "options": guest_opts
     })
 
     guest_auth = GuestAuth(guest_token=guest["token"])

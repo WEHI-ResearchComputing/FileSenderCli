@@ -65,12 +65,12 @@ class FileSenderClient:
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        session: requests.Session = requests.Session(),
+        session: Optional[requests.Session] = None,
         threads: int = 1
     ):
         self.base_url = base_url
         self.auth = auth
-        self.session = session
+        self.session = session or requests.Session()
         self.executor = ThreadPoolExecutor(max_workers=threads)
         
         info = self.get_server_info()
@@ -185,6 +185,7 @@ class FileSenderClient:
         self,
         body: request.Guest
     ) -> response.Guest:
+        """Sends a voucher to a guest to invite them to send files"""
         return self.sign_send(Request(
             "POST",
             f"{self.base_url}/guest",
