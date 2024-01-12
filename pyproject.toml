@@ -24,7 +24,14 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "pytest_asyncio"
+    "pytest_asyncio",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "mkdocs-typer",
+    "pymdown-extensions",
+    "pygments",
+    "black"
 ]
 
 [project.scripts]

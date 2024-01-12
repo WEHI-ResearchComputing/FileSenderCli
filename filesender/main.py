@@ -22,7 +22,6 @@ def typer_async(f: Callable[P, Coroutine[Any, Any, T]]):
 
 
 ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
-Threads = Annotated[int, Option(help="The maximum number of threads to use for concurrently uploading files")]
 Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
 Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. Increase this value if you have a slow connection. This value should be approximately the time it takes you to upload one chunk to the server.", metavar="N")]
 

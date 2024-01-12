@@ -49,7 +49,7 @@ async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes
 @dataclass
 class FileSenderClient:
     """
-    Client that can be used to programmatically interact with FileSender
+    A client that can be used to programmatically interact with FileSender.
     """
     #: The base url of the file sender's API. For example https://filesender.aarnet.edu.au/rest.php
     base_url: str
@@ -66,6 +66,18 @@ class FileSenderClient:
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
     ):
+        """
+        Args:
+            base_url: The base URL for the FileSender instance you want to interact with.
+                This should just be a host name such as `https://filesender.aarnet.edu.au`, 
+                and should *not* include `/rest.php` or any other path element.
+            chunk_size: The chunk size used for uploading, which is the amount of data that is sent to the server per request.
+                By default this is the maximum chunk size allowed by the server, but you might want to adjust this to reduce memory
+                usage or because you are getting timeout errors.
+            auth: The authentication method.
+                This is optional, but you almost always want to provide it.
+                Generally you will want to use :py:class:`filesender.UserAuth` or `GuestAuth`.
+        """
         self.base_url = base_url
         self.auth = auth
         self.http_client = AsyncClient(timeout=None)

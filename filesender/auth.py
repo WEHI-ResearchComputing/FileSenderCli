@@ -28,10 +28,16 @@ def url_without_scheme(url: str) -> str:
 
 @dataclass
 class UserAuth(Auth):
+    """
+    Used to authenticate the `FileSenderClient` with all permissions of a full user.
+
+    Attributes:
+        username: The username (generally the email address) of the user performing FileSender operations 
+        api_key: The API key that corresponds to the username. You can generally obtain this at the <https://some.filesender.domain/?s=user> URL.
+        delay: The number of seconds to delay the timestamp. See <https://docs.filesender.org/filesender/v2.0/rest/#signed-request>
+    """
     username: str
     api_key: str
-    #: The number of seconds to delay the timestamp.
-    #: See https://docs.filesender.org/filesender/v2.0/rest/#signed-request
     delay: int = 0
 
     def sign(self, request: SignType, client: AsyncClient) -> SignType:
@@ -68,6 +74,12 @@ class UserAuth(Auth):
 
 @dataclass(unsafe_hash=True)
 class GuestAuth(Auth):
+    """
+    Used to authenticate the FileSenderClient with a guest token
+
+    Attributes:
+        guest_token: The string after `vid=` in the voucher link
+    """
     guest_token: str
     security_token: Optional[str] = None
     csrf_token: Optional[str] = None
