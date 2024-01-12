@@ -7,7 +7,31 @@ import pytest
 
 from filesender.request_types import GuestOptions
 
-def test_round_trip(base_url, username, apikey, recipient):
+@pytest.mark.parametrize("guest_opts", [
+    {},
+    {"can_only_send_to_me": False}
+])
+def test_guest_creation(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
+    user_client = FileSenderClient(
+        base_url=base_url,
+        auth=UserAuth(
+            api_key=apikey,
+            username=username
+        )
+    )
+
+    # Invite the guest
+    guest = user_client.create_guest({
+        "recipient": recipient,
+        "from": username,
+        "options": {
+            "guest": guest_opts
+        }
+    })
+
+    assert len(guest["options"]) == len(guest_opts)
+
+def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
     """
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading

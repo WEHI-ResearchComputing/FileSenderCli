@@ -67,7 +67,7 @@ Guest = TypedDict("Guest", {
     "from": str,
     "subject": NotRequired[str],
     "message": NotRequired[str],
-    "options": NotRequired[GuestOptions],
-    "transfer_options": NotRequired[TransferOptions],
+    # See https://github.com/filesender/filesender/issues/1772
+    "options": NotRequired[GuestAllOptions],
     "expires": NotRequired[int]
 })

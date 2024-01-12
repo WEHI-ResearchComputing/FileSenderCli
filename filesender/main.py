@@ -34,7 +34,7 @@ def invite(
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
     context: Context,
-    verbose: Annotated[bool, Argument(help="Enable more detailed outputs")] = False,
+    verbose: Verbose,
     # Although these parameters are exact duplicates of those in GuestOptions,
     # typer doesn't support re-using argument lists: https://github.com/tiangolo/typer/discussions/665
     one_time: Annotated[bool, Option(help="If true, this voucher is only valid for one use, otherwise it can be re-used.")] = True,
@@ -61,13 +61,18 @@ def invite(
         "from": username,
         "recipient": recipient,
         "options": {
-            "valid_only_one_time": one_time,
-            "can_only_send_to_me": only_to_me,
-            "email_upload_started": email_upload_started,
-            "email_upload_page_access": email_page_access,
-            "email_guest_created": email_guest_created,
-            "email_guest_created_receipt": email_receipt,
-            "email_guest_expired": email_guest_expired
+            "guest": {
+                "valid_only_one_time": one_time,
+                "can_only_send_to_me": only_to_me,
+                "email_upload_started": email_upload_started,
+                "email_upload_page_access": email_page_access,
+                "email_guest_created": email_guest_created,
+                "email_guest_created_receipt": email_receipt,
+                "email_guest_expired": email_guest_expired
+            },
+            "transfer": {
+                "add_me_to_recipients": False
+            }
         }
     })
     if verbose:
