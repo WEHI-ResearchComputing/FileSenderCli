@@ -5,7 +5,7 @@
 Requires `Python>=3.11`
 
 ```bash
-pip install git+https://github.com/WEHI-ResearchComputing/FileSenderCli.git
+pip install filesender-client
 ```
 
 ## Usage
