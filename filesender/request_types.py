@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import List
 from typing_extensions import TypedDict, NotRequired
 
 class File(TypedDict):
@@ -27,13 +27,14 @@ class TransferOptions(TypedDict, total=False):
     web_notification_when_upload_is_complete: bool
     verify_email_to_download: bool
 
-PartialTransfer = TypedDict("Transfer", {
+PartialTransfer = TypedDict("PartialTransfer", {
     "options": NotRequired[TransferOptions],
     "expires": NotRequired[int],
     "subject": NotRequired[str],
     "message": NotRequired[str],
     # The below fields are not required when uploading to a voucher
     "recipients": NotRequired[List[str]],
+    # We need to use the expression syntax for TypedDict because `from` is a Python keyword
     "from": NotRequired[str]
 })
 

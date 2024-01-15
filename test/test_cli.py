@@ -49,7 +49,6 @@ def test_large_upload(base_url: str, username: str, apikey: str, recipient: str,
             "--apikey", apikey,
             "--recipients", recipient,
             "--delay", str(delay),
-            "--threads", "8"
         ], catch_exceptions=False)
         if result.exit_code != 0:
             raise Exception(result.output)

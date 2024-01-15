@@ -4,34 +4,10 @@ from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
 from random import randbytes
 import pytest
-
 from filesender.request_types import GuestOptions
 
-@pytest.mark.parametrize("guest_opts", [
-    {},
-    {"can_only_send_to_me": False}
-])
-def test_guest_creation(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
-    user_client = FileSenderClient(
-        base_url=base_url,
-        auth=UserAuth(
-            api_key=apikey,
-            username=username
-        )
-    )
-
-    # Invite the guest
-    guest = user_client.create_guest({
-        "recipient": recipient,
-        "from": username,
-        "options": {
-            "guest": guest_opts
-        }
-    })
-
-    assert len(guest["options"]) == len(guest_opts)
-
-def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
+@pytest.mark.asyncio
+async def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
     """
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
@@ -44,6 +20,7 @@ def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
             username=username
         )
     )
+    await user_client.prepare()
 
     with tempfile.NamedTemporaryFile("wb", delete=False, suffix=".dat") as file:
         path = Path(file.name)
@@ -52,7 +29,7 @@ def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
         file.close()
 
         # The user uploads the file
-        transfer = user_client.upload_workflow(
+        transfer = await user_client.upload_workflow(
             files=[path],
             transfer_args={
                 "recipients": [recipient],
@@ -65,7 +42,7 @@ def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
     
     with tempfile.TemporaryDirectory() as download_dir:
         # An anonymous user downloads the file
-        download_client.download_file(
+        await download_client.download_file(
             token=transfer["recipients"][0]["token"],
             file_id=transfer["files"][0]["id"],
             out_dir=Path(download_dir)
@@ -73,16 +50,16 @@ def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
         assert len(list(Path(download_dir).iterdir())) == 1
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize("guest_opts", [
     {},
     {"can_only_send_to_me": False}
 ])
-def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
+async def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
     """
     This tests uploading a 1GB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-
     user_client = FileSenderClient(
         base_url=base_url,
         auth=UserAuth(
@@ -92,19 +69,21 @@ def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient
     )
 
     # Invite the guest
-    guest = user_client.create_guest({
+    guest = await user_client.create_guest({
         "recipient": recipient,
         "from": username,
-        "options": guest_opts
+        "options": {
+            "guest": guest_opts
+        }
     })
 
     guest_auth = GuestAuth(guest_token=guest["token"])
     guest_client = FileSenderClient(
         base_url=base_url,
         auth=guest_auth,
-        threads=1
     )
-    guest_auth.prepare(guest_client.session)
+    await guest_client.prepare()
+    await guest_auth.prepare(guest_client.http_client)
 
     with tempfile.NamedTemporaryFile("wb", delete=False) as file:
         path = Path(file.name)
@@ -113,7 +92,7 @@ def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient
         file.close()
 
         # The guest uploads the file
-        transfer = guest_client.upload_workflow(
+        transfer = await guest_client.upload_workflow(
             files=[path],
             transfer_args={
                 "recipients": [username]
@@ -123,9 +102,35 @@ def test_voucher_round_trip(base_url: str, username: str, apikey: str, recipient
     
     with tempfile.TemporaryDirectory() as download_dir:
         # The user downloads the file
-        user_client.download_file(
+        await user_client.download_file(
             token=transfer["recipients"][0]["token"],
             file_id=transfer["files"][0]["id"],
             out_dir=Path(download_dir)
         )
         assert len(list(Path(download_dir).iterdir())) == 1
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("guest_opts", [
+    {},
+    {"can_only_send_to_me": False}
+])
+async def test_guest_creation(base_url: str, username: str, apikey: str, recipient: str, guest_opts: GuestOptions):
+    user_client = FileSenderClient(
+        base_url=base_url,
+        auth=UserAuth(
+            api_key=apikey,
+            username=username
+        )
+    )
+
+    # Invite the guest
+    guest = await user_client.create_guest({
+        "recipient": recipient,
+        "from": username,
+        "options": {
+            "guest": guest_opts
+        }
+    })
+
+    # Check that the options were acknowledged by the server 
+    assert len(guest["options"]) == len(guest_opts)

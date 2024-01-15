@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional, Iterator, Tuple
-import requests
+from typing import Any, List, Optional, Tuple, AsyncIterator
+from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
-from requests import Request, Response, HTTPError
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
-from shutil import copyfileobj
 from pathlib import Path
-from io import IOBase
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from httpx import Request, AsyncClient, HTTPStatusError, RequestError
+from asyncio import TaskGroup
+import aiofiles
+from contextlib import contextmanager
 
 def url_without_scheme(url: str) -> str:
     """
@@ -20,103 +20,146 @@ def url_without_scheme(url: str) -> str:
     """
     return unquote(urlunparse(urlparse(url)._replace(scheme="")).lstrip("/"))
 
-def raise_status(response: Response):
+@contextmanager
+def raise_status():
     """
     Does nothing if the response was successful.
     If it failed, throws a user friendly error
     """
     try:
-        response.raise_for_status()
-    except HTTPError as e:
-        if e.request:
-            raise Exception(f"Request failed with content {e.response.json()} for request {e.request.method} {e.request.url}") from e
-        else:
-            raise e
+        yield
+    except HTTPStatusError as e:
+        raise Exception(f"Request failed with content {e.response.json()} for request {e.request.method} {e.request.url}") from e
+    except RequestError as e:
+        raise Exception(f"Request failed for request {e.request.method} {e.request.url}") from e
 
-def yield_chunks(file: IOBase, chunk_size: int) -> Iterator[Tuple[bytes, int]]:
+async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes, int]]:
     """
     Yields (chunk, offset) tuples from a file, chunked by chunk_size
     """
-    offset = 0
-    while True:
-        chunk = file.read(chunk_size)
-        if not chunk:
-            break
-        yield chunk, offset
-        offset += len(chunk)
+    async with aiofiles.open(path, "rb") as fp:
+        offset = 0
+        while True:
+            chunk = await fp.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk, offset
+            offset += len(chunk)
 
 @dataclass
 class FileSenderClient:
     """
-    Client that can be used to programmatically interact with FileSender
+    A client that can be used to programmatically interact with FileSender.
     """
     #: The base url of the file sender's API. For example https://filesender.aarnet.edu.au/rest.php
     base_url: str
     #: Size of upload chunks
-    chunk_size: int
+    chunk_size: Optional[int]
     #: Authentication provider that will be used for all privileged requests
     auth: Auth
     # Session to use for all HTTP requests
-    session: requests.Session
-    executor: ThreadPoolExecutor
+    http_client: AsyncClient
 
     def __init__(
         self,
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        session: Optional[requests.Session] = None,
-        threads: int = 1
     ):
+        """
+        Args:
+            base_url: The base URL for the FileSender instance you want to interact with.
+                This should just be a host name such as `https://filesender.aarnet.edu.au`, 
+                and should *not* include `/rest.php` or any other path element.
+            chunk_size: The chunk size used for uploading, which is the amount of data that is sent to the server per request.
+                By default this is the maximum chunk size allowed by the server, but you might want to adjust this to reduce memory
+                usage or because you are getting timeout errors.
+            auth: The authentication method.
+                This is optional, but you almost always want to provide it.
+                Generally you will want to use [`UserAuth`][filesender.UserAuth] or [`GuestAuth`][filesender.GuestAuth].
+        """
         self.base_url = base_url
         self.auth = auth
-        self.session = session or requests.Session()
-        self.executor = ThreadPoolExecutor(max_workers=threads)
-        
-        info = self.get_server_info()
-        if chunk_size is None:
-            self.chunk_size = info["upload_chunk_size"]
-        elif chunk_size > info["upload_chunk_size"]:
-            raise Exception(f"--chunk-size can't be greater than the server's maximum supported chunk size. For this server, the maximum is {info['upload_chunk_size']}")
-        else:
-            self.chunk_size = chunk_size
+        self.http_client = AsyncClient(timeout=None)
+        self.chunk_size = chunk_size
 
-    def sign_send(self, request: Request) -> Any:
+    async def prepare(self) -> None:
+        """
+        Checks that the chunk size is appropriate and/or sets the chunk size based on the server info.
+        This should always be run before using the client.
+        """
+        info = await self.get_server_info()
+        if self.chunk_size is None:
+            self.chunk_size = info["upload_chunk_size"]
+        elif self.chunk_size > info["upload_chunk_size"]:
+            raise Exception(f"--chunk-size can't be greater than the server's maximum supported chunk size. For this server, the maximum is {info['upload_chunk_size']}")
+
+    async def _sign_send(self, request: Request) -> Any:
         """
         Signs a request and sends it, returning the JSON result
         """
-        prep = self.session.prepare_request(self.auth.sign(request, self.session))
-        res = self.session.send(prep)
-        raise_status(res)
+        self.auth.sign(request, self.http_client)
+        with raise_status():
+            res = await self.http_client.send(request)
+            res.raise_for_status()
         return res.json()
 
-    def create_transfer(
+    async def create_transfer(
         self,
         body: request.Transfer,
     ) -> response.Transfer:
-        return self.sign_send(Request(
+        """
+        Tells FileSender that you intend to start building a new transfer.
+        Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
+
+        Params:
+            body: See [`Transfer`][filesender.request_types.Transfer].
+
+        Returns:
+            : See [`Transfer`][filesender.response_types.Transfer] (this is a different type from the input parameter).
+        """
+        return await self._sign_send(self.http_client.build_request(
             "POST",
             f"{self.base_url}/transfer",
             json=body,
         ))
 
-    def update_transfer(
+    async def update_transfer(
         self,
         transfer_id: int,
         body: request.TransferUpdate,
     ) -> response.Transfer:
-        return self.sign_send(Request(
+        """
+        Updates an existing transfer, e.g. to indicate that it has finished.
+        Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
+
+        Params:
+            transfer_id: Identifier obtained from the result of [`create_transfer`][filesender.FileSenderClient.create_transfer]
+            body: See [`TransferUpdate`][filesender.request_types.TransferUpdate]
+
+        Returns:
+            : See [`Transfer`][filesender.response_types.Transfer]
+        """
+        return await self._sign_send(self.http_client.build_request(
             "PUT",
             f"{self.base_url}/transfer/{transfer_id}",
             json=body,
         ))
 
-    def update_file(
+    async def update_file(
         self,
         file_info: response.File,
         body: request.FileUpdate,
-    ):
-        return self.sign_send(Request(
+    ) -> None:
+        """
+        Updates metadata for an existing file, e.g. to indicate that it has finished.
+        Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
+
+        Params:
+            file_info: Identifier obtained from the result of [`create_transfer`][filesender.FileSenderClient.create_transfer]
+            body: See [`FileUpdate`][filesender.request_types.FileUpdate]
+        """
+        await self._sign_send(self.http_client.build_request(
             "PUT",
             f"{self.base_url}/file/{file_info['id']}",
             params={
@@ -125,113 +168,174 @@ class FileSenderClient:
             json=body,
         ))
 
-    def upload_file(
+    async def upload_file(
         self,
         file_info: response.File,
-        file: IOBase
+        path: Path
     ) -> None:
         """
         Uploads a file, with multiple chunks being uploaded in parallel
+        Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
+
+        Params:
+            file_info: Identifier obtained from the result of [`create_transfer`][filesender.FileSenderClient.create_transfer]
+            path: File path to the file to be uploaded
         """
-        queue: List[Future[Response]] = []
-        for chunk, offset in yield_chunks(file, self.chunk_size):
-            request = self.session.prepare_request(
-                self._upload_chunk_request(
-                    chunk=chunk,
-                    offset=offset,
-                    file_info=file_info
+        if self.chunk_size is None:
+            raise Exception(".prepare() has not been called!")
+
+        # Upload each chunk concurrently
+        async with TaskGroup() as tg:
+            async for chunk, offset in yield_chunks(path, self.chunk_size):
+                tg.create_task(
+                    self._upload_chunk(
+                        chunk=chunk,
+                        offset=offset,
+                        file_info=file_info
+                    )
                 )
-            )
 
-            fut = self.executor.submit(self.session.send, request)
-            # Keep adding to the queue until we have n jobs running
-            if len(queue) < self.executor._max_workers:
-                queue.append(fut)
-            else:
-                # Once we reach a full queue, only add new futures as previous ones finish.
-                # This prevents the entire file being read into memory
-                for future in as_completed(queue):
-                    raise_status(future.result())
-                    i = queue.index(future)
-                    queue[i] = fut
-                    break
-        
-        # Once we've submitted everything, wait for the remaining tasks to finish
-        for future in as_completed(queue):
-            raise_status(future.result())
-
-    def _upload_chunk_request(
+    async def _upload_chunk(
         self,
         file_info: response.File,
         offset: int,
         chunk: bytes,
-    ) -> requests.Request:
-        return self.auth.sign(Request(
+    ) -> None:
+        """
+        Internal function to upload a single chunk of data for a file
+        """
+        return await self._sign_send(self.http_client.build_request(
             "PUT",
             f"{self.base_url}/file/{file_info['id']}/chunk/{offset}",
             params={
                 "key": file_info["uid"]
             },
-            data=chunk,
+            content=chunk,
             headers={
                 "Content-Type": 'application/octet-stream',
                 "X-Filesender-File-Size": str(file_info["size"]),
                 "X-Filesender-Chunk-Offset": str(offset),
                 "X-Filesender-Chunk-Size": str(len(chunk))
             },
-        ), self.session)
+        ))
 
-    def create_guest(
+    async def create_guest(
         self,
         body: request.Guest
     ) -> response.Guest:
-        """Sends a voucher to a guest to invite them to send files"""
-        return self.sign_send(Request(
+        """
+        Sends a voucher to a guest to invite them to send files
+
+        Params:
+            body: see [`Guest`][filesender.request_types.Guest]
+
+        Returns:
+            : See [`Guest`][filesender.response_types.Guest]
+        """
+        return await self._sign_send(self.http_client.build_request(
             "POST",
             f"{self.base_url}/guest",
             json=body
         ))
 
-    def download_file(
+    async def _files_from_token(self, token: str) -> set[int]:
+        """
+        Internal function that returns a list of file IDs for a given guest token
+        """
+        download_page = await self.http_client.get(
+            "https://filesender.aarnet.edu.au",
+            params = {
+                "s": "download",
+                "token": token
+            }
+        )
+        files = set()
+        for file in BeautifulSoup(download_page.content, "html.parser").find_all(class_="file"):
+            files.add(int(file.attrs["data-id"]))
+        return files
+
+    async def download_files(
+        self,
+        token: str,
+        out_dir: Path
+    ) -> None:
+        """
+        Downloads all files for a transfer.
+
+        Params:
+            token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
+            out_dir: The path to write the downloaded files.
+        """
+        async with TaskGroup() as tg:
+            for file in await self._files_from_token(token):
+                tg.create_task(
+                    self.download_file(
+                        token=token,
+                        file_id=file,
+                        out_dir=out_dir
+                    )
+                )
+
+    async def download_file(
         self,
         token: str,
         file_id: int,
         out_dir: Path
-    ):
+    ) -> None:
+        """
+        Downloads a single file.
+
+        Params:
+            token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
+            file_id: A single file ID indicating the file to be downloaded.
+            out_dir: The path to write the downloaded file.
+        """
         download_endpoint = urlunparse(urlparse(self.base_url)._replace(path="/download.php"))
-        res = requests.get(download_endpoint, params={
+        async with self.http_client.stream("GET", download_endpoint, params={
             "files_ids": file_id,
             "token": token
-        }, stream=True)
-        for content_param in res.headers["Content-Disposition"].split(";"):
-            if "filename" in content_param:
-                filename = content_param.split("=")[1].lstrip('"').rstrip('"')
-                break
-        else:
-            raise Exception("No filename found")
+        }) as res:
+            for content_param in res.headers["Content-Disposition"].split(";"):
+                if "filename" in content_param:
+                    filename = content_param.split("=")[1].lstrip('"').rstrip('"')
+                    break
+            else:
+                raise Exception("No filename found")
 
-        with (out_dir / filename).open("wb") as fp:
-            copyfileobj(res.raw, fp)
+            async with aiofiles.open(out_dir / filename, "wb") as fp:
+                async for chunk in res.aiter_raw(chunk_size=8192):
+                    await fp.write(chunk)
 
-    def get_server_info(
+    async def get_server_info(
         self
     ) -> response.ServerInfo:
-        return requests.get(f"{self.base_url}/info").json()
+        """
+        Returns all information known about the current FileSender server.
 
-    def upload_workflow(
+        Returns:
+            : See [`ServerInfo`][filesender.response_types.ServerInfo].
+        """
+        return (await self.http_client.get(f"{self.base_url}/info")).json()
+
+    async def upload_workflow(
         self,
         files: List[Path],
         transfer_args: request.PartialTransfer = {}
     ) -> response.Transfer:
         """
-        Reusable function for uploading one or more files
+        High level function for uploading one or more files
+
         Args:
-            transfer_args: Additional options to include when creating the transfer, for example a subject or message
+            files: A list of files to upload.
+            transfer_args: Additional options to include when creating the transfer, for example a subject or message. See [`PartialTransfer`][filesender.request_types.PartialTransfer].
+
+        Returns:
+            : See [`Transfer`][filesender.response_types.Transfer]
         """
         files_by_name = {
             path.name: path for path in files
         }
-        transfer = self.create_transfer({
+        transfer = await self.create_transfer({
             "files": [{
                 "name": file.name,
                 "size": file.stat().st_size
@@ -241,21 +345,34 @@ class FileSenderClient:
             },
             **transfer_args
         })
-        self.session.params["roundtriptoken"] = transfer["roundtriptoken"]
-        for file in transfer["files"]:
-            with files_by_name[file["name"]].open("rb") as fp:
-                # list forces the processing to occur
-                self.upload_file(
+        self.http_client.params = self.http_client.params.set("roundtriptoken", transfer["roundtriptoken"])
+        # Upload each file in parallel
+        async with TaskGroup() as tg:
+            for file in transfer["files"]:
+                tg.create_task(self.upload_complete(
                     file_info=file,
-                    file=fp
-                )
-                self.update_file(
-                    file_info=file,
-                    body={"complete": True}
-                )
+                    path=files_by_name[file["name"]]
+                ))
 
-        transfer = self.update_transfer(
+        transfer = await self.update_transfer(
             transfer_id=transfer["id"],
             body={"complete": True}
         )
         return transfer
+
+    async def upload_complete(self,
+        file_info: response.File,
+        path: Path
+    ) -> None:
+        """
+        Uploads a file and marks the upload as complete.
+        Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
+        """
+        await self.upload_file(
+            file_info=file_info,
+            path=path
+        )
+        await self.update_file(
+            file_info=file_info,
+            body={"complete": True}
+        )
