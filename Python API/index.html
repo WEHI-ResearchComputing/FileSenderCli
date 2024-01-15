@@ -1,0 +1,1700 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="request_types/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>Python API - FileSenderCLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#python-api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="FileSenderCLI" class="md-header__button md-logo" aria-label="FileSenderCLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FileSenderCLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Python API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FileSenderCLI" class="md-nav__button md-logo" aria-label="FileSenderCLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    FileSenderCLI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Command Line Interface
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Python API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileSenderClient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FileSenderClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      prepare
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.create_guest" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_guest
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.upload_workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.download_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.get_server_info" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_server_info
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.create_transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_transfer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.update_transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_transfer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.update_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.upload_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.download_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.upload_complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_complete
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.UserAuth" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserAuth
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.GuestAuth" class="md-nav__link">
+    <span class="md-ellipsis">
+      GuestAuth
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="request_types/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Request Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="response_types/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Response Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileSenderClient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FileSenderClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      prepare
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.create_guest" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_guest
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.upload_workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.download_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.get_server_info" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_server_info
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.create_transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_transfer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.update_transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_transfer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.update_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.upload_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.download_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.FileSenderClient.upload_complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_complete
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.UserAuth" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserAuth
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.GuestAuth" class="md-nav__link">
+    <span class="md-ellipsis">
+      GuestAuth
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="python-api">Python API</h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.FileSenderClient" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.FileSenderClient</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FileSenderClient</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">base_url</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">auth</span><span class="p">:</span> <span class="n"><span title="filesender.auth.Auth">Auth</span></span> <span class="o">=</span> <span class="n">Auth</span><span class="p">(),</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents first">
+
+  
+      <p>A client that can be used to programmatically interact with FileSender.</p>
+  
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>base_url</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The base URL for the FileSender instance you want to interact with.
+This should just be a host name such as <code>https://filesender.aarnet.edu.au</code>, 
+and should <em>not</em> include <code>/rest.php</code> or any other path element.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>chunk_size</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[int]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The chunk size used for uploading, which is the amount of data that is sent to the server per request.
+By default this is the maximum chunk size allowed by the server, but you might want to adjust this to reduce memory
+usage or because you are getting timeout errors.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>auth</code></td>
+          <td>
+                <code><span title="filesender.auth.Auth">Auth</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The authentication method.
+This is optional, but you almost always want to provide it.
+Generally you will want to use <a class="autorefs autorefs-internal" href="#filesender.UserAuth"><code>UserAuth</code></a> or <a class="autorefs autorefs-internal" href="#filesender.GuestAuth"><code>GuestAuth</code></a>.</p>
+            </div>
+          </td>
+          <td>
+                <code><span title="filesender.auth.Auth">Auth</span>()</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.prepare" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">prepare</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">prepare</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Checks that the chunk size is appropriate and/or sets the chunk size based on the server info.
+This should always be run before using the client.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.create_guest" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">create_guest</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create_guest</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="n"><span title="filesender.Guest">Guest</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="filesender.Guest">Guest</span></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Sends a voucher to a guest to invite them to send files</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>body</code></td>
+          <td>
+                <code><span title="filesender.Guest">Guest</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>see <a class="autorefs autorefs-internal" href="request_types/#filesender.request_types.Guest"><code>Guest</code></a></p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="filesender.Guest">Guest</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="response_types/#filesender.response_types.Guest"><code>Guest</code></a></p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.upload_workflow" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">upload_workflow</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">upload_workflow</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">files</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><span title="pathlib.Path">Path</span></span><span class="p">],</span> <span class="n">transfer_args</span><span class="p">:</span> <span class="n"><span title="filesender.PartialTransfer">PartialTransfer</span></span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="filesender.Transfer">Transfer</span></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>High level function for uploading one or more files</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>files</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[<span title="pathlib.Path">Path</span>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A list of files to upload.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>transfer_args</code></td>
+          <td>
+                <code><span title="filesender.PartialTransfer">PartialTransfer</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional options to include when creating the transfer, for example a subject or message. See <a class="autorefs autorefs-internal" href="request_types/#filesender.request_types.PartialTransfer"><code>PartialTransfer</code></a>.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="filesender.Transfer">Transfer</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="response_types/#filesender.response_types.Transfer"><code>Transfer</code></a></p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.download_files" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">download_files</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">download_files</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Downloads all files for a transfer.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>token</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Obtained from the transfer email. The same as <a class="autorefs autorefs-internal" href="#filesender.GuestAuth"><code>GuestAuth</code></a>'s <code>guest_token</code>.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_dir</code></td>
+          <td>
+                <code><span title="pathlib.Path">Path</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The path to write the downloaded files.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.get_server_info" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">get_server_info</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_server_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="filesender.ServerInfo">ServerInfo</span></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns all information known about the current FileSender server.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="filesender.ServerInfo">ServerInfo</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="response_types/#filesender.response_types.ServerInfo"><code>ServerInfo</code></a>.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.create_transfer" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">create_transfer</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create_transfer</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="n"><span title="filesender.Transfer">Transfer</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="filesender.Transfer">Transfer</span></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Tells FileSender that you intend to start building a new transfer.
+Generally you should use <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.upload_workflow"><code>upload_workflow</code></a> instead of this, which is much more user friendly.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>body</code></td>
+          <td>
+                <code><span title="filesender.Transfer">Transfer</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="request_types/#filesender.request_types.Transfer"><code>Transfer</code></a>.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="filesender.Transfer">Transfer</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="response_types/#filesender.response_types.Transfer"><code>Transfer</code></a> (this is a different type from the input parameter).</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.update_transfer" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">update_transfer</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">update_transfer</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">transfer_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n"><span title="filesender.TransferUpdate">TransferUpdate</span></span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="filesender.Transfer">Transfer</span></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Updates an existing transfer, e.g. to indicate that it has finished.
+Generally you should use <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.upload_workflow"><code>upload_workflow</code></a> instead of this, which is much more user friendly.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>transfer_id</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Identifier obtained from the result of <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.create_transfer"><code>create_transfer</code></a></p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>body</code></td>
+          <td>
+                <code><span title="filesender.TransferUpdate">TransferUpdate</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="request_types/#filesender.request_types.TransferUpdate"><code>TransferUpdate</code></a></p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="filesender.Transfer">Transfer</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="response_types/#filesender.response_types.Transfer"><code>Transfer</code></a></p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.update_file" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">update_file</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">update_file</span><span class="p">(</span><span class="n">file_info</span><span class="p">:</span> <span class="n"><span title="filesender.File">File</span></span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n"><span title="filesender.FileUpdate">FileUpdate</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Updates metadata for an existing file, e.g. to indicate that it has finished.
+Generally you should use <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.upload_workflow"><code>upload_workflow</code></a> instead of this, which is much more user friendly.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>file_info</code></td>
+          <td>
+                <code><span title="filesender.File">File</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Identifier obtained from the result of <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.create_transfer"><code>create_transfer</code></a></p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>body</code></td>
+          <td>
+                <code><span title="filesender.FileUpdate">FileUpdate</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>See <a class="autorefs autorefs-internal" href="request_types/#filesender.request_types.FileUpdate"><code>FileUpdate</code></a></p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.upload_file" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">upload_file</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">upload_file</span><span class="p">(</span><span class="n">file_info</span><span class="p">:</span> <span class="n"><span title="filesender.File">File</span></span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Uploads a file, with multiple chunks being uploaded in parallel
+Generally you should use <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.upload_workflow"><code>upload_workflow</code></a> instead of this, which is much more user friendly.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>file_info</code></td>
+          <td>
+                <code><span title="filesender.File">File</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Identifier obtained from the result of <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.create_transfer"><code>create_transfer</code></a></p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>path</code></td>
+          <td>
+                <code><span title="pathlib.Path">Path</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>File path to the file to be uploaded</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.download_file" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">download_file</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">download_file</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">token</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">file_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Downloads a single file.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>token</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Obtained from the transfer email. The same as <a class="autorefs autorefs-internal" href="#filesender.GuestAuth"><code>GuestAuth</code></a>'s <code>guest_token</code>.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>file_id</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A single file ID indicating the file to be downloaded.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_dir</code></td>
+          <td>
+                <code><span title="pathlib.Path">Path</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The path to write the downloaded file.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="filesender.FileSenderClient.upload_complete" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">upload_complete</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">upload_complete</span><span class="p">(</span><span class="n">file_info</span><span class="p">:</span> <span class="n"><span title="filesender.File">File</span></span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Uploads a file and marks the upload as complete.
+Generally you should use <a class="autorefs autorefs-internal" href="#filesender.FileSenderClient.upload_workflow"><code>upload_workflow</code></a> instead of this, which is much more user friendly.</p>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.UserAuth" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.UserAuth</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="filesender.auth.Auth">Auth</span></code></p>
+
+  
+      <p>Used to authenticate the <code>FileSenderClient</code> with all permissions of a full user.</p>
+
+
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code><span title="filesender.UserAuth.username">username</span></code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The username (generally the email address) of the user performing FileSender operations </p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code><span title="filesender.UserAuth.api_key">api_key</span></code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The API key that corresponds to the username. You can generally obtain this at the <a href="https://some.filesender.domain/?s=user">https://some.filesender.domain/?s=user</a> URL.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code><span title="filesender.UserAuth.delay">delay</span></code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The number of seconds to delay the timestamp. See <a href="https://docs.filesender.org/filesender/v2.0/rest/#signed-request">https://docs.filesender.org/filesender/v2.0/rest/#signed-request</a></p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.GuestAuth" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.GuestAuth</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="filesender.auth.Auth">Auth</span></code></p>
+
+  
+      <p>Used to authenticate the FileSenderClient with a guest token</p>
+
+
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code><span title="filesender.GuestAuth.guest_token">guest_token</span></code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The string after <code>vid=</code> in the voucher link</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>

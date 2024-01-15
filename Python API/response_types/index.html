@@ -1,0 +1,3552 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../request_types/">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>Response Types - FileSenderCLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#response-types" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="FileSenderCLI" class="md-header__button md-logo" aria-label="FileSenderCLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FileSenderCLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Response Types
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="FileSenderCLI" class="md-nav__button md-logo" aria-label="FileSenderCLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    FileSenderCLI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Command Line Interface
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Python API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request_types/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Request Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Response Types
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Response Types
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.File" class="md-nav__link">
+    <span class="md-ellipsis">
+      File
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.sha1" class="md-nav__link">
+    <span class="md-ellipsis">
+      sha1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.size" class="md-nav__link">
+    <span class="md-ellipsis">
+      size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.transfer_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.uid" class="md-nav__link">
+    <span class="md-ellipsis">
+      uid
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Date">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Date.formatted" class="md-nav__link">
+    <span class="md-ellipsis">
+      formatted
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Date.raw" class="md-nav__link">
+    <span class="md-ellipsis">
+      raw
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrackingError
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TrackingError">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError.date" class="md-nav__link">
+    <span class="md-ellipsis">
+      date
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError.details" class="md-nav__link">
+    <span class="md-ellipsis">
+      details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError.type" class="md-nav__link">
+    <span class="md-ellipsis">
+      type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recipient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recipient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.created" class="md-nav__link">
+    <span class="md-ellipsis">
+      created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.download_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.last_activity" class="md-nav__link">
+    <span class="md-ellipsis">
+      last_activity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.token" class="md-nav__link">
+    <span class="md-ellipsis">
+      token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.transfer_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_id
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transfer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transfer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.created" class="md-nav__link">
+    <span class="md-ellipsis">
+      created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.expires" class="md-nav__link">
+    <span class="md-ellipsis">
+      expires
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.expiry_date_extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      expiry_date_extension
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.files" class="md-nav__link">
+    <span class="md-ellipsis">
+      files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.message" class="md-nav__link">
+    <span class="md-ellipsis">
+      message
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.recipients" class="md-nav__link">
+    <span class="md-ellipsis">
+      recipients
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.roundtriptoken" class="md-nav__link">
+    <span class="md-ellipsis">
+      roundtriptoken
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.salt" class="md-nav__link">
+    <span class="md-ellipsis">
+      salt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.subject" class="md-nav__link">
+    <span class="md-ellipsis">
+      subject
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.user_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.user_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_id
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Guest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Guest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.created" class="md-nav__link">
+    <span class="md-ellipsis">
+      created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.expires" class="md-nav__link">
+    <span class="md-ellipsis">
+      expires
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.message" class="md-nav__link">
+    <span class="md-ellipsis">
+      message
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.subject" class="md-nav__link">
+    <span class="md-ellipsis">
+      subject
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.token" class="md-nav__link">
+    <span class="md-ellipsis">
+      token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.transfer_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_count
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.transfer_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.user_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.user_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_id
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Author" class="md-nav__link">
+    <span class="md-ellipsis">
+      Author
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Author">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      ip
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.type" class="md-nav__link">
+    <span class="md-ellipsis">
+      type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Target" class="md-nav__link">
+    <span class="md-ellipsis">
+      Target
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Target">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.size" class="md-nav__link">
+    <span class="md-ellipsis">
+      size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.type" class="md-nav__link">
+    <span class="md-ellipsis">
+      type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditLog
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AuditLog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.author" class="md-nav__link">
+    <span class="md-ellipsis">
+      author
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.date" class="md-nav__link">
+    <span class="md-ellipsis">
+      date
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.event" class="md-nav__link">
+    <span class="md-ellipsis">
+      event
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.target" class="md-nav__link">
+    <span class="md-ellipsis">
+      target
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      ServerInfo
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ServerInfo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.logon_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      logon_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.upload_chunk_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_chunk_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.url" class="md-nav__link">
+    <span class="md-ellipsis">
+      url
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.File" class="md-nav__link">
+    <span class="md-ellipsis">
+      File
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.sha1" class="md-nav__link">
+    <span class="md-ellipsis">
+      sha1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.size" class="md-nav__link">
+    <span class="md-ellipsis">
+      size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.transfer_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.File.uid" class="md-nav__link">
+    <span class="md-ellipsis">
+      uid
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Date">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Date.formatted" class="md-nav__link">
+    <span class="md-ellipsis">
+      formatted
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Date.raw" class="md-nav__link">
+    <span class="md-ellipsis">
+      raw
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrackingError
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TrackingError">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError.date" class="md-nav__link">
+    <span class="md-ellipsis">
+      date
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError.details" class="md-nav__link">
+    <span class="md-ellipsis">
+      details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.TrackingError.type" class="md-nav__link">
+    <span class="md-ellipsis">
+      type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recipient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recipient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.created" class="md-nav__link">
+    <span class="md-ellipsis">
+      created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.download_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.last_activity" class="md-nav__link">
+    <span class="md-ellipsis">
+      last_activity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.token" class="md-nav__link">
+    <span class="md-ellipsis">
+      token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Recipient.transfer_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_id
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transfer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transfer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.created" class="md-nav__link">
+    <span class="md-ellipsis">
+      created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.expires" class="md-nav__link">
+    <span class="md-ellipsis">
+      expires
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.expiry_date_extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      expiry_date_extension
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.files" class="md-nav__link">
+    <span class="md-ellipsis">
+      files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.message" class="md-nav__link">
+    <span class="md-ellipsis">
+      message
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.recipients" class="md-nav__link">
+    <span class="md-ellipsis">
+      recipients
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.roundtriptoken" class="md-nav__link">
+    <span class="md-ellipsis">
+      roundtriptoken
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.salt" class="md-nav__link">
+    <span class="md-ellipsis">
+      salt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.subject" class="md-nav__link">
+    <span class="md-ellipsis">
+      subject
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.user_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Transfer.user_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_id
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Guest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Guest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.created" class="md-nav__link">
+    <span class="md-ellipsis">
+      created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.expires" class="md-nav__link">
+    <span class="md-ellipsis">
+      expires
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.message" class="md-nav__link">
+    <span class="md-ellipsis">
+      message
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.subject" class="md-nav__link">
+    <span class="md-ellipsis">
+      subject
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.token" class="md-nav__link">
+    <span class="md-ellipsis">
+      token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.transfer_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_count
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.transfer_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      transfer_options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.user_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Guest.user_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      user_id
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Author" class="md-nav__link">
+    <span class="md-ellipsis">
+      Author
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Author">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      ip
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Author.type" class="md-nav__link">
+    <span class="md-ellipsis">
+      type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.Target" class="md-nav__link">
+    <span class="md-ellipsis">
+      Target
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Target">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.email" class="md-nav__link">
+    <span class="md-ellipsis">
+      email
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.size" class="md-nav__link">
+    <span class="md-ellipsis">
+      size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.Target.type" class="md-nav__link">
+    <span class="md-ellipsis">
+      type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditLog
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AuditLog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.author" class="md-nav__link">
+    <span class="md-ellipsis">
+      author
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.date" class="md-nav__link">
+    <span class="md-ellipsis">
+      date
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.event" class="md-nav__link">
+    <span class="md-ellipsis">
+      event
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.AuditLog.target" class="md-nav__link">
+    <span class="md-ellipsis">
+      target
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      ServerInfo
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ServerInfo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.logon_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      logon_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.upload_chunk_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload_chunk_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesender.response_types.ServerInfo.url" class="md-nav__link">
+    <span class="md-ellipsis">
+      url
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="response-types">Response Types</h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.File" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.File</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.File.id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.File.name" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">name</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">name</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.File.sha1" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">sha1</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">sha1</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.File.size" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">size</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">size</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.File.transfer_id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">transfer_id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">transfer_id</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.File.uid" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">uid</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">uid</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.Date" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.Date</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Date.formatted" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">formatted</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">formatted</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Date.raw" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">raw</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">raw</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.TrackingError" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.TrackingError</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.TrackingError.date" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">date</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">date</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.TrackingError.details" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">details</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">details</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.TrackingError.type" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">type</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">type</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.Recipient" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.Recipient</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.created" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">created</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">created</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.download_url" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">download_url</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">download_url</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.email" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">email</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">email</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.errors" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">errors</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">errors</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.TrackingError" href="#filesender.response_types.TrackingError">TrackingError</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.last_activity" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">last_activity</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">last_activity</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.options" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">options</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">options</span><span class="p">:</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.token" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">token</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">token</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Recipient.transfer_id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">transfer_id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">transfer_id</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.Transfer" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.Transfer</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.created" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">created</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">created</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.expires" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">expires</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">expires</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.expiry_date_extension" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">expiry_date_extension</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">expiry_date_extension</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.files" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">files</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">files</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.File" href="#filesender.response_types.File">File</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.message" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">message</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">message</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.options" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">options</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">options</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n">str</span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.recipients" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">recipients</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">recipients</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Recipient" href="#filesender.response_types.Recipient">Recipient</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.roundtriptoken" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">roundtriptoken</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">roundtriptoken</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.salt" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">salt</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">salt</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.subject" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">subject</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">subject</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.user_email" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">user_email</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user_email</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Transfer.user_id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">user_id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user_id</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.Guest" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.Guest</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.created" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">created</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">created</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.email" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">email</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">email</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.errors" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">errors</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">errors</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.TrackingError" href="#filesender.response_types.TrackingError">TrackingError</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.expires" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">expires</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">expires</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.message" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">message</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">message</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.options" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">options</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">options</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n">str</span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.subject" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">subject</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">subject</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.token" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">token</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">token</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.transfer_count" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">transfer_count</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">transfer_count</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.transfer_options" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">transfer_options</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">transfer_options</span><span class="p">:</span> <span class="n"><span title="typing.List">List</span></span><span class="p">[</span><span class="n">str</span><span class="p">]</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.user_email" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">user_email</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user_email</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Guest.user_id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">user_id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user_id</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.Author" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.Author</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Author.email" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">email</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">email</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Author.id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Author.ip" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">ip</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ip</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Author.type" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">type</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">type</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.Target" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.Target</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Target.email" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">email</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">email</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Target.id" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Target.name" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">name</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">name</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Target.size" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">size</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">size</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.Target.type" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">type</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">type</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.AuditLog" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.AuditLog</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.AuditLog.author" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">author</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">author</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Author" href="#filesender.response_types.Author">Author</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.AuditLog.date" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">date</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">date</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Date" href="#filesender.response_types.Date">Date</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.AuditLog.event" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">event</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.AuditLog.target" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">target</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">target</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="filesender.response_types.Target" href="#filesender.response_types.Target">Target</a></span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="filesender.response_types.ServerInfo" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">filesender.response_types.ServerInfo</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.ServerInfo.logon_url" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">logon_url</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">logon_url</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.ServerInfo.name" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">name</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">name</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.ServerInfo.upload_chunk_size" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">upload_chunk_size</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">upload_chunk_size</span><span class="p">:</span> <span class="n">int</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="filesender.response_types.ServerInfo.url" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">url</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">url</span><span class="p">:</span> <span class="n">str</span>
+</span></code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>
