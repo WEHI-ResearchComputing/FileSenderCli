@@ -1,13 +1,14 @@
 from typing import Any, List, Optional, Callable, ParamSpec, TypeVar, Coroutine
 from typing_extensions import Annotated
 from filesender.api import FileSenderClient
-from typer import Typer, Option, Argument, Context
+from typer import Typer, Option, Argument, Context, Exit
 from rich import print
 from pathlib import Path
 from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
 from functools import wraps
 from asyncio import run
+import pkg_resources
 
 from filesender.response_types import Guest, Transfer
 
@@ -30,10 +31,19 @@ context = {
 }
 app = Typer(name="filesender")
 
+def version_callback(value: bool):
+    if value:
+            print(pkg_resources.require("filesender-client")[0].version)
+            raise Exit()
+
+
 @app.callback(context_settings=context)
 def common_args(
     base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
-    context: Context
+    context: Context,
+    version: Annotated[
+        Optional[bool], Option("--version", callback=version_callback)
+    ] = None
 ):
     context.obj = {
         "base_url": base_url
@@ -162,6 +172,16 @@ def download(
         out_dir=out_dir
     ))
     print(f"Download completed successfully. Files can be found in {out_dir}")
+
+@app.command(context_settings=context)
+@typer_async
+async def server_info(
+    context: Context,
+):
+    """Prints out information about the FileSender server you are interfacing with"""
+    client = FileSenderClient(base_url=context.obj["base_url"])
+    result = await client.get_server_info()
+    print(result)
 
 if __name__ == "__main__":
     app()
