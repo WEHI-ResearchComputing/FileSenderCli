@@ -29,7 +29,7 @@ def raise_status():
     try:
         yield
     except HTTPStatusError as e:
-        raise Exception(f"Request failed with content {e.response.json()} for request {e.request.method} {e.request.url}") from e
+        raise Exception(f"Request failed with content {e.response.text} for request {e.request.method} {e.request.url}") from e
     except RequestError as e:
         raise Exception(f"Request failed for request {e.request.method} {e.request.url}") from e
 
