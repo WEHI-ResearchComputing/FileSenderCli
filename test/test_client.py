@@ -25,9 +25,9 @@ def make_tempfile(size: int, **kwargs):
         path.unlink()
     
 @contextmanager
-def make_tempfiles(size: int, n: 2, **kwargs):
+def make_tempfiles(size: int, n: int = 2, **kwargs):
     with ExitStack() as stack:
-        files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in n]
+        files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in range(n)]
         yield files
 
 
