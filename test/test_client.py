@@ -141,7 +141,7 @@ async def test_upload_semaphore(
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-    with make_tempfile(size=100_000_000) as path_a, make_tempfile(size=100_000_000) as path_b, mp.get_context("spawn").Pool() as pool:
+    with make_tempfile(size=100_000_000) as path_a, make_tempfile(size=100_000_000) as path_b, mp.get_context("spawn").Pool(processes=1) as pool:
         (limited_rss, limited_time), (unlimited_rss, unlimited_time) = pool.starmap(
             upload_capture_mem_sync,
             [
