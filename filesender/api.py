@@ -33,18 +33,19 @@ def raise_status():
     except RequestError as e:
         raise Exception(f"Request failed for request {e.request.method} {e.request.url}") from e
 
-async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes, int]]:
+async def yield_chunks(path: Path, chunk_size: int, semaphore: Semaphore) -> AsyncIterator[Tuple[bytes, int]]:
     """
     Yields (chunk, offset) tuples from a file, chunked by chunk_size
     """
     async with aiofiles.open(path, "rb") as fp:
         offset = 0
         while True:
-            chunk = await fp.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk, offset
-            offset += len(chunk)
+            async with semaphore:
+                chunk = await fp.read(chunk_size)
+                if not chunk:
+                    break
+                yield chunk, offset
+                offset += len(chunk)
 
 class FileSenderClient:
     """
@@ -193,15 +194,14 @@ class FileSenderClient:
 
         # Upload each chunk concurrently
         async with TaskGroup() as tg:
-            async for chunk, offset in yield_chunks(path, self.chunk_size):
-                async with self.semaphore:
-                    tg.create_task(
-                        self._upload_chunk(
-                            chunk=chunk,
-                            offset=offset,
-                            file_info=file_info
-                        )
+            async for chunk, offset in yield_chunks(path, self.chunk_size, semaphore=self.semaphore):
+                tg.create_task(
+                    self._upload_chunk(
+                        chunk=chunk,
+                        offset=offset,
+                        file_info=file_info
                     )
+                )
 
     async def _upload_chunk(
         self,
