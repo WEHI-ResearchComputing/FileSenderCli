@@ -125,8 +125,8 @@ async def upload_capture_mem(client_args: dict, upload_args: dict) -> int:
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
 
-def upload_capture_mem_sync(*args):
-    asyncio.run(upload_capture_mem(*args))
+def upload_capture_mem_sync(*args) -> int:
+    return asyncio.run(upload_capture_mem(*args))
 
 
 @pytest.mark.asyncio
