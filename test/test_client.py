@@ -5,7 +5,7 @@ from pathlib import Path
 from random import randbytes
 import pytest
 from filesender.request_types import GuestOptions
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 import multiprocessing as mp
 import resource
 import asyncio
@@ -13,7 +13,7 @@ import time
 
 
 @contextmanager
-def make_tempfile(size: int, **kwargs) -> Path:
+def make_tempfile(size: int, **kwargs):
     """
     Makes a temporary binary file filled with `size` random bytes, and returns a path to it
     """
@@ -23,6 +23,12 @@ def make_tempfile(size: int, **kwargs) -> Path:
         file.close()
         yield Path(file.name)
         path.unlink()
+    
+@contextmanager
+def make_tempfiles(size: int, n: 2, **kwargs):
+    with ExitStack() as stack:
+        files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in n]
+        yield files
 
 
 @pytest.mark.asyncio
@@ -141,7 +147,7 @@ async def test_upload_semaphore(
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-    with make_tempfile(size=100_000_000) as path_a, make_tempfile(size=100_000_000) as path_b, mp.get_context("spawn").Pool(processes=1) as pool:
+    with make_tempfiles(size=100_000_000, n=10) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
         (limited_rss, limited_time), (unlimited_rss, unlimited_time) = pool.starmap(
             upload_capture_mem_sync,
             [
@@ -152,7 +158,7 @@ async def test_upload_semaphore(
                         "max_concurrency": 1,
                     },
                     {
-                        "files": [path_a, path_b],
+                        "files": paths,
                         "transfer_args": {"recipients": [recipient], "from": username},
                     },
                 ),
@@ -163,7 +169,7 @@ async def test_upload_semaphore(
                         "max_concurrency": None,
                     },
                     {
-                        "files": [path_a, path_b],
+                        "files": paths,
                         "transfer_args": {"recipients": [recipient], "from": username},
                     },
                 ),
