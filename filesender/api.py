@@ -40,7 +40,7 @@ async def yield_chunks(path: Path, chunk_size: int, semaphore: Semaphore) -> Asy
     async with aiofiles.open(path, "rb") as fp:
         offset = 0
         while True:
-            print(f"Locked {semaphore.locked}")
+            print(f"{semaphore.locked()=}, {semaphore._waiters=}")
             async with semaphore:
                 chunk = await fp.read(chunk_size)
                 if not chunk:
