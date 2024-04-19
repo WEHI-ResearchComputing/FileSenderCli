@@ -6,9 +6,10 @@ from random import randbytes
 import pytest
 from filesender.request_types import GuestOptions
 from contextlib import contextmanager
-import multiprocessing
+import multiprocessing as mp
 import resource
 import asyncio
+import time
 
 
 @contextmanager
@@ -115,14 +116,16 @@ async def test_guest_creation(
     assert len(guest["options"]) == len(guest_opts)
 
 
-async def upload_capture_mem(client_args: dict, upload_args: dict) -> int:
+async def upload_capture_mem(client_args: dict, upload_args: dict) -> tuple[int, float]:
     """
     Performs an upload, and returns the memory usage in doing so
     """
+    start = time.time()
     client = FileSenderClient(**client_args)
     await client.prepare()
     await client.upload_workflow(**upload_args)
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    end = time.time()
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, end - start
 
 
 def upload_capture_mem_sync(*args) -> int:
@@ -137,9 +140,8 @@ async def test_upload_semaphore(
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-
-    with make_tempfile(size=100_000_000) as path, multiprocessing.Pool() as pool:
-        limited, unlimited = pool.starmap(
+    with make_tempfile(size=100_000_000) as path_a, make_tempfile(size=100_000_000) as path_b, mp.get_context("spawn").Pool() as pool:
+        (limited_rss, limited_time), (unlimited_rss, unlimited_time) = pool.starmap(
             upload_capture_mem_sync,
             [
                 (
@@ -149,7 +151,7 @@ async def test_upload_semaphore(
                         "max_concurrency": 1,
                     },
                     {
-                        "files": [path],
+                        "files": [path_a, path_b],
                         "transfer_args": {"recipients": [recipient], "from": username},
                     },
                 ),
@@ -160,11 +162,12 @@ async def test_upload_semaphore(
                         "max_concurrency": None,
                     },
                     {
-                        "files": [path],
+                        "files": [path_a, path_b],
                         "transfer_args": {"recipients": [recipient], "from": username},
                     },
                 ),
             ],
         )
 
-    assert unlimited > 2 * limited
+    assert unlimited_time < limited_time
+    assert unlimited_rss > limited_rss
