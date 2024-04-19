@@ -122,6 +122,7 @@ async def upload_capture_mem(client_args: dict, upload_args: dict) -> tuple[int,
     """
     start = time.time()
     client = FileSenderClient(**client_args)
+    print(f"Semaphore with {client.semaphore._value}")
     await client.prepare()
     await client.upload_workflow(**upload_args)
     end = time.time()
