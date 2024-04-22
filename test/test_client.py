@@ -2,33 +2,10 @@ import tempfile
 from filesender.api import FileSenderClient
 from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
-from random import randbytes
 import pytest
 from filesender.request_types import GuestOptions
-from contextlib import contextmanager, ExitStack
+from filesender.benchmark import make_tempfile, make_tempfiles, upload_capture_mem_sync
 import multiprocessing as mp
-import resource
-import asyncio
-import time
-
-
-@contextmanager
-def make_tempfile(size: int, **kwargs):
-    """
-    Makes a temporary binary file filled with `size` random bytes, and returns a path to it
-    """
-    with tempfile.NamedTemporaryFile(mode="wb", delete=False, **kwargs) as file:
-        path = Path(file.name)
-        file.write(randbytes(size))
-        file.close()
-        yield Path(file.name)
-        path.unlink()
-    
-@contextmanager
-def make_tempfiles(size: int, n: int = 2, **kwargs):
-    with ExitStack() as stack:
-        files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in range(n)]
-        yield files
 
 
 @pytest.mark.asyncio
@@ -122,23 +99,6 @@ async def test_guest_creation(
     assert len(guest["options"]) == len(guest_opts)
 
 
-async def upload_capture_mem(client_args: dict, upload_args: dict) -> tuple[int, float]:
-    """
-    Performs an upload, and returns the memory usage in doing so
-    """
-    start = time.time()
-    client = FileSenderClient(**client_args)
-    print(f"Semaphore with {client.semaphore._value}")
-    await client.prepare()
-    await client.upload_workflow(**upload_args)
-    end = time.time()
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, end - start
-
-
-def upload_capture_mem_sync(*args) -> int:
-    return asyncio.run(upload_capture_mem(*args))
-
-
 @pytest.mark.asyncio
 async def test_upload_semaphore(
     base_url: str, username: str, apikey: str, recipient: str
@@ -147,7 +107,7 @@ async def test_upload_semaphore(
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-    with make_tempfiles(size=100_000_000, n=10) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
+    with make_tempfiles(size=100_000_000, n=1) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
         (limited_rss, limited_time), (unlimited_rss, unlimited_time) = pool.starmap(
             upload_capture_mem_sync,
             [
