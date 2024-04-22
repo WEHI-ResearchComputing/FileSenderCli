@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple, AsyncIterator
 from bs4 import BeautifulSoup
 import filesender.response_types as response
@@ -7,7 +6,7 @@ from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
 from httpx import Request, AsyncClient, HTTPStatusError, RequestError
-from asyncio import TaskGroup
+from asyncio import TaskGroup, Semaphore
 import aiofiles
 from contextlib import contextmanager
 
@@ -46,7 +45,6 @@ async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes
             yield chunk, offset
             offset += len(chunk)
 
-@dataclass
 class FileSenderClient:
     """
     A client that can be used to programmatically interact with FileSender.
@@ -59,29 +57,44 @@ class FileSenderClient:
     auth: Auth
     # Session to use for all HTTP requests
     http_client: AsyncClient
+    #: Limits concurrent reads
+    _read_sem: Semaphore
+    #: Limits concurrent requests
+    _req_sem: Semaphore
 
     def __init__(
         self,
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
+        concurrent_reads: Optional[int] = None,
+        concurrent_requests: Optional[int] = None
     ):
         """
         Args:
             base_url: The base URL for the FileSender instance you want to interact with.
                 This should just be a host name such as `https://filesender.aarnet.edu.au`, 
                 and should *not* include `/rest.php` or any other path element.
-            chunk_size: The chunk size used for uploading, which is the amount of data that is sent to the server per request.
+            chunk_size: The chunk size (in bytes) used for uploading, which is the amount of data that is sent to the server per request.
                 By default this is the maximum chunk size allowed by the server, but you might want to adjust this to reduce memory
                 usage or because you are getting timeout errors.
             auth: The authentication method.
                 This is optional, but you almost always want to provide it.
                 Generally you will want to use [`UserAuth`][filesender.UserAuth] or [`GuestAuth`][filesender.GuestAuth].
+            concurrent_reads: The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory
+                usage of the application. See <https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb> for a
+                detailed explanation of this parameter.
+            concurrent_requests: The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory
+                usage of the application. See <https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb> for a
+                detailed explanation of this parameter.
         """
         self.base_url = base_url
         self.auth = auth
         self.http_client = AsyncClient(timeout=None)
         self.chunk_size = chunk_size
+        # If we don't want a concurrency limit, we just use an infinitely large semaphore
+        self._read_sem = Semaphore(concurrent_reads or float("inf"))
+        self._req_sem = Semaphore(concurrent_requests or float("inf"))
 
     async def prepare(self) -> None:
         """
@@ -99,9 +112,10 @@ class FileSenderClient:
         Signs a request and sends it, returning the JSON result
         """
         self.auth.sign(request, self.http_client)
-        with raise_status():
-            res = await self.http_client.send(request)
-            res.raise_for_status()
+        async with self._req_sem:
+            with raise_status():
+                res = await self.http_client.send(request)
+                res.raise_for_status()
         return res.json()
 
     async def create_transfer(
@@ -187,13 +201,14 @@ class FileSenderClient:
         # Upload each chunk concurrently
         async with TaskGroup() as tg:
             async for chunk, offset in yield_chunks(path, self.chunk_size):
-                tg.create_task(
-                    self._upload_chunk(
-                        chunk=chunk,
-                        offset=offset,
-                        file_info=file_info
+                async with self._read_sem:
+                    tg.create_task(
+                        self._upload_chunk(
+                            chunk=chunk,
+                            offset=offset,
+                            file_info=file_info
+                        )
                     )
-                )
 
     async def _upload_chunk(
         self,

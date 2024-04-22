@@ -33,7 +33,9 @@ dev = [
     "mkdocs-typer",
     "pymdown-extensions",
     "pygments",
-    "black"
+    "black",
+    "seaborn",
+    "pandas"
 ]
 
 [project.scripts]
