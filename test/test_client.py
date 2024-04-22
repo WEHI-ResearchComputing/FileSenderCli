@@ -104,9 +104,9 @@ async def test_upload_semaphore(
     base_url: str, username: str, apikey: str, recipient: str
 ):
     """
-    This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
-    but also the multithreaded uploading
+    Tests that limiting the concurrency of the client increases the runtime but decreases the memory usage
     """
-    limited, unlimited = benchmark([1, float("inf")], base_url, username, apikey, recipient)
+    with make_tempfiles(size=100_000_000, n=3) as paths:
+        limited, unlimited = benchmark(paths, [1, float("inf")], [1, float("inf")], base_url, username, apikey, recipient)
     assert unlimited.time < limited.time
     assert unlimited.memory > limited.memory
