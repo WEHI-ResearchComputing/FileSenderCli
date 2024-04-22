@@ -762,17 +762,15 @@
 <h2 id="filesender.FileSenderClient" class="doc doc-heading">
           <span class="doc doc-object-name doc-class-name">filesender.FileSenderClient</span>
 
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
 
 </h2>
 <div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FileSenderClient</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">base_url</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">auth</span><span class="p">:</span> <span class="n"><span title="filesender.auth.Auth">Auth</span></span> <span class="o">=</span> <span class="n">Auth</span><span class="p">(),</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">concurrent_reads</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">concurrent_requests</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents first">
@@ -817,7 +815,7 @@ and should <em>not</em> include <code>/rest.php</code> or any other path element
           </td>
           <td>
             <div class="doc-md-description">
-              <p>The chunk size used for uploading, which is the amount of data that is sent to the server per request.
+              <p>The chunk size (in bytes) used for uploading, which is the amount of data that is sent to the server per request.
 By default this is the maximum chunk size allowed by the server, but you might want to adjust this to reduce memory
 usage or because you are getting timeout errors.</p>
             </div>
@@ -840,6 +838,38 @@ Generally you will want to use <a class="autorefs autorefs-internal" href="#file
           </td>
           <td>
                 <code><span title="filesender.auth.Auth">Auth</span>()</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>concurrent_reads</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[int]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory
+usage of the application. See <a href="https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb">https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb</a> for a
+detailed explanation of this parameter.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>concurrent_requests</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[int]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory
+usage of the application. See <a href="https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb">https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb</a> for a
+detailed explanation of this parameter.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
           </td>
         </tr>
     </tbody>
