@@ -6,6 +6,7 @@ nav:
     - Python API/index.md
     - Python API/request_types.md
     - Python API/response_types.md
+    - Python API/benchmark.md
   - changelog.md
   - 'Benchmark': benchmark.ipynb
 

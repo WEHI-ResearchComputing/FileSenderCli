@@ -3,8 +3,8 @@
 ## Version 1.2.0
 
 ### Added
-* `concurrent_reads` argument to the `FileSenderClient()` constructor. This parameter controls the maximum number of file chunks that can be processed at a time.
-* `concurrent_requests` argument to the `FileSenderClient()` constructor. This controls the maximum number of API requests the client can be waiting for at a time.
+* [`concurrent_reads`](Python API/index.md#filesender.FileSenderClient) argument to the `FileSenderClient()` constructor. This parameter controls the maximum number of file chunks that can be processed at a time.
+* [`concurrent_requests`](Python API/index.md#filesender.FileSenderClient) argument to the `FileSenderClient()` constructor. This controls the maximum number of API requests the client can be waiting for at a time.
 * [`benchmark` notebook](https://wehi-researchcomputing.github.io/FileSenderCli/benchmark/) that evaluates how manipulating the above two parameters affect runtime and memory usage
 * A simple test that validates the effectiveness of the above parameters
 * A `filesender.benchmark` module which contains utilities for benchmarking that are used by both the notebook and the test
