@@ -4,7 +4,7 @@ from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
 import pytest
 from filesender.request_types import GuestOptions
-from filesender.benchmark import make_tempfile, make_tempfiles, upload_capture_mem_sync
+from filesender.benchmark import make_tempfile, make_tempfiles, upload_capture_mem_sync, benchmark
 import multiprocessing as mp
 
 
@@ -107,34 +107,6 @@ async def test_upload_semaphore(
     This tests uploading a 1MB file, with ensures that the chunking behaviour is correct,
     but also the multithreaded uploading
     """
-    with make_tempfiles(size=100_000_000, n=1) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
-        (limited_rss, limited_time), (unlimited_rss, unlimited_time) = pool.starmap(
-            upload_capture_mem_sync,
-            [
-                (
-                    {
-                        "base_url": base_url,
-                        "auth": UserAuth(api_key=apikey, username=username),
-                        "max_concurrency": 1,
-                    },
-                    {
-                        "files": paths,
-                        "transfer_args": {"recipients": [recipient], "from": username},
-                    },
-                ),
-                (
-                    {
-                        "base_url": base_url,
-                        "auth": UserAuth(api_key=apikey, username=username),
-                        "max_concurrency": None,
-                    },
-                    {
-                        "files": paths,
-                        "transfer_args": {"recipients": [recipient], "from": username},
-                    },
-                ),
-            ],
-        )
-
-    assert unlimited_time < limited_time
-    assert unlimited_rss > limited_rss
+    limited, unlimited = benchmark([1, float("inf")], base_url, username, apikey, recipient)
+    assert unlimited.time < limited.time
+    assert unlimited.memory > limited.memory
