@@ -48,7 +48,6 @@ async def upload_capture_mem(client_args: dict, upload_args: dict) -> BenchResul
     Performs an upload, and returns the memory usage in doing so
     """
     client = FileSenderClient(**client_args)
-    print(f"Semaphore with {client.semaphore._value}")
     await client.prepare()
     start = time.monotonic()
     await client.upload_workflow(**upload_args)
@@ -61,7 +60,7 @@ async def upload_capture_mem(client_args: dict, upload_args: dict) -> BenchResul
 def upload_capture_mem_sync(*args: Any) -> BenchResult:
     return asyncio.run(upload_capture_mem(*args))
 
-def benchmark(semaphore_levels: Iterable[int], base_url: str, username: str, apikey: str, recipient: str) -> list[BenchResult]:
+def benchmark(semaphore_levels: Iterable[int | float], base_url: str, username: str, apikey: str, recipient: str) -> list[BenchResult]:
     """
     Run a test upload using a variety of semaphore levels, and return one result for each
 
@@ -70,7 +69,7 @@ def benchmark(semaphore_levels: Iterable[int], base_url: str, username: str, api
     """
     # We use multiprocessing so that each benchmark runs in a separate Python interpreter with a separate RSS
     # The spawn context ensures that no memory is shared with the controlling process
-    with make_tempfiles(size=100_000_000, n=1) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
+    with make_tempfiles(size=100_000_000, n=3) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
         args = [] 
         for level in semaphore_levels:
             args.append(({
