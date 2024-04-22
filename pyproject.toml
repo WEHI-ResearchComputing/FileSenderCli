@@ -34,7 +34,8 @@ dev = [
     "pymdown-extensions",
     "pygments",
     "black",
-    "matplotlib"
+    "seaborn",
+    "pandas"
 ]
 
 [project.scripts]

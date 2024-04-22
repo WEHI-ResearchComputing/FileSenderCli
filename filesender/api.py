@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple, AsyncIterator
 from bs4 import BeautifulSoup
 import filesender.response_types as response
@@ -33,19 +32,18 @@ def raise_status():
     except RequestError as e:
         raise Exception(f"Request failed for request {e.request.method} {e.request.url}") from e
 
-async def yield_chunks(path: Path, chunk_size: int, semaphore: Semaphore) -> AsyncIterator[Tuple[bytes, int]]:
+async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes, int]]:
     """
     Yields (chunk, offset) tuples from a file, chunked by chunk_size
     """
     async with aiofiles.open(path, "rb") as fp:
         offset = 0
         while True:
-            async with semaphore:
-                chunk = await fp.read(chunk_size)
-                if not chunk:
-                    break
-                yield chunk, offset
-                offset += len(chunk)
+            chunk = await fp.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk, offset
+            offset += len(chunk)
 
 class FileSenderClient:
     """
@@ -59,15 +57,18 @@ class FileSenderClient:
     auth: Auth
     # Session to use for all HTTP requests
     http_client: AsyncClient
-    #: Restricts the client from over-using resources
-    semaphore: Semaphore
+    #: Limits concurrent reads
+    _read_sem: Semaphore
+    #: Limits concurrent requests
+    _req_sem: Semaphore
 
     def __init__(
         self,
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        max_concurrency: Optional[int] = None
+        concurrent_reads: Optional[int] = None,
+        concurrent_requests: Optional[int] = None
     ):
         """
         Args:
@@ -89,7 +90,8 @@ class FileSenderClient:
         self.http_client = AsyncClient(timeout=None)
         self.chunk_size = chunk_size
         # If we don't want a concurrency limit, we just use an infinitely large semaphore
-        self.semaphore = Semaphore(max_concurrency or float("inf"))
+        self._read_sem = Semaphore(concurrent_reads or float("inf"))
+        self._req_sem = Semaphore(concurrent_requests or float("inf"))
 
     async def prepare(self) -> None:
         """
@@ -107,9 +109,10 @@ class FileSenderClient:
         Signs a request and sends it, returning the JSON result
         """
         self.auth.sign(request, self.http_client)
-        with raise_status():
-            res = await self.http_client.send(request)
-            res.raise_for_status()
+        async with self._req_sem:
+            with raise_status():
+                res = await self.http_client.send(request)
+                res.raise_for_status()
         return res.json()
 
     async def create_transfer(
@@ -194,14 +197,15 @@ class FileSenderClient:
 
         # Upload each chunk concurrently
         async with TaskGroup() as tg:
-            async for chunk, offset in yield_chunks(path, self.chunk_size, semaphore=self.semaphore):
-                tg.create_task(
-                    self._upload_chunk(
-                        chunk=chunk,
-                        offset=offset,
-                        file_info=file_info
+            async for chunk, offset in yield_chunks(path, self.chunk_size):
+                async with self._read_sem:
+                    tg.create_task(
+                        self._upload_chunk(
+                            chunk=chunk,
+                            offset=offset,
+                            file_info=file_info
+                        )
                     )
-                )
 
     async def _upload_chunk(
         self,

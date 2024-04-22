@@ -60,26 +60,24 @@ async def upload_capture_mem(client_args: dict, upload_args: dict) -> BenchResul
 def upload_capture_mem_sync(*args: Any) -> BenchResult:
     return asyncio.run(upload_capture_mem(*args))
 
-def benchmark(semaphore_levels: Iterable[int | float], base_url: str, username: str, apikey: str, recipient: str) -> list[BenchResult]:
+def benchmark(read_limit: Iterable[int | float], req_limit: Iterable[int | float], base_url: str, username: str, apikey: str, recipient: str) -> list[BenchResult]:
     """
-    Run a test upload using a variety of semaphore levels, and return one result for each
-
-    Args:
-        semaphore_levels: The maximum concurrency allowed.
+    Run a test upload using a variety of semaphore settings, and return one result for each.
     """
     # We use multiprocessing so that each benchmark runs in a separate Python interpreter with a separate RSS
     # The spawn context ensures that no memory is shared with the controlling process
     with make_tempfiles(size=100_000_000, n=3) as paths, mp.get_context("spawn").Pool(processes=1) as pool:
         args = [] 
-        for level in semaphore_levels:
+        for concurrent_reads, concurrent_requests in zip(read_limit, req_limit):
             args.append(({
-                        "base_url": base_url,
-                        "auth": UserAuth(api_key=apikey, username=username),
-                        "max_concurrency": level,
-                    },
-                    {
-                        "files": paths,
-                        "transfer_args": {"recipients": [recipient], "from": username},
-                    }
+                    "base_url": base_url,
+                    "auth": UserAuth(api_key=apikey, username=username),
+                    "concurrent_reads": concurrent_reads,
+                    "concurrent_requests": concurrent_requests
+                },
+                {
+                    "files": paths,
+                    "transfer_args": {"recipients": [recipient], "from": username},
+                }
             ))
         return pool.starmap(upload_capture_mem_sync, args)
