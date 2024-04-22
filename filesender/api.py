@@ -82,11 +82,11 @@ class FileSenderClient:
                 This is optional, but you almost always want to provide it.
                 Generally you will want to use [`UserAuth`][filesender.UserAuth] or [`GuestAuth`][filesender.GuestAuth].
             concurrent_reads: The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory
-                usage of the application. See <https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb> for a
-                detailed explanation of this parameter.
+                usage of the application. None, the default value, sets no limit.
+                See <https://wehi-researchcomputing.github.io/FileSenderCli/benchmark> for a detailed explanation of this parameter.
             concurrent_requests: The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory
-                usage of the application. See <https://github.com/WEHI-ResearchComputing/FileSenderCli/blob/main/benchmark.ipynb> for a
-                detailed explanation of this parameter.
+                usage of the application. None, the default value, sets no limit.
+                See <https://wehi-researchcomputing.github.io/FileSenderCli/benchmark> for a detailed explanation of this parameter.
         """
         self.base_url = base_url
         self.auth = auth

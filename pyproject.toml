@@ -31,6 +31,7 @@ dev = [
     "mkdocs-material",
     "mkdocstrings[python]",
     "mkdocs-typer",
+    "mkdocs-jupyter",
     "pymdown-extensions",
     "pygments",
     "black",

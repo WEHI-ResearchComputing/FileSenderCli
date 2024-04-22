@@ -1,5 +1,14 @@
 site_name: "FileSenderCLI"
 
+nav:
+  - index.md
+  - Python API:
+    - Python API/index.md
+    - Python API/request_types.md
+    - Python API/response_types.md
+  - changelog.md
+  - 'Benchmark': benchmark.ipynb
+
 theme:
   name: "material"
 
@@ -22,6 +31,7 @@ plugins:
           docstring_options:
             ignore_init_summary: false
             trim_doctest_flags: false
+- mkdocs-jupyter
 
 markdown_extensions:
   - toc:
