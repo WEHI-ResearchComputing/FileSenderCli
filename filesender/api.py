@@ -90,7 +90,8 @@ class FileSenderClient:
         """
         self.base_url = base_url
         self.auth = auth
-        self.http_client = AsyncClient(timeout=None)
+        # FileSender seems to sometimes use redirects
+        self.http_client = AsyncClient(timeout=None, follow_redirects=True)
         self.chunk_size = chunk_size
         # If we don't want a concurrency limit, we just use an infinitely large semaphore
         self._read_sem = Semaphore(concurrent_reads or float("inf"))
