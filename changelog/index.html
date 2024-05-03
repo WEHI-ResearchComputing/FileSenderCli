@@ -350,6 +350,39 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-121" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.2.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 1.2.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-120" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.2.0
@@ -393,7 +426,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       Fixed
     </span>
@@ -461,6 +494,39 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-121" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.2.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 1.2.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-120" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.2.0
@@ -504,7 +570,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       Fixed
     </span>
@@ -533,6 +599,15 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="version-121">Version 1.2.1</h2>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Removed the annoying <code>rich</code> error logs which often made it impossible to determine the true underlying error</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>A bug where the FileSender server would respond with a redirect, which would cause the client to fail</li>
+</ul>
 <h2 id="version-120">Version 1.2.0</h2>
 <h3 id="added">Added</h3>
 <ul>
@@ -548,7 +623,7 @@
 <li><code>--version</code> flag, to check for the current package version</li>
 <li><code>server-info</code> command, which is a utility for describing the configuration of the server you are using</li>
 </ul>
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed_1">Fixed</h3>
 <ul>
 <li><code>httpx.PoolTimeout</code> errors, by enforcing a newer <code>httpcore</code> library</li>
 <li><code>json.decoder.JSONDecodeError</code> errors, by not assuming that all errors are JSON. This should better reveal the true underlying error</li>
