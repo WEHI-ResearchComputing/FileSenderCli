@@ -31,7 +31,7 @@ ConcurrentReqs = Annotated[Optional[int], Option(help="The maximum number of API
 context = {
     "default_map": get_defaults()
 }
-app = Typer(name="filesender")
+app = Typer(name="filesender", pretty_exceptions_enable=False)
 
 def version_callback(value: bool):
     if value:
