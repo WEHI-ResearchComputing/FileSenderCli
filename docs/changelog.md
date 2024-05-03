@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 1.2.1
+
+### Changed
+
+* Removed the annoying `rich` error logs which often made it impossible to determine the true underlying error
+
+### Fixed
+
+* A bug where the FileSender server would respond with a redirect, which would cause the client to fail
+
 ## Version 1.2.0
 
 ### Added
