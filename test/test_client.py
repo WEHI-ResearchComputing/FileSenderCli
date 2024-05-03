@@ -4,8 +4,7 @@ from filesender.auth import UserAuth, GuestAuth
 from pathlib import Path
 import pytest
 from filesender.request_types import GuestOptions
-from filesender.benchmark import make_tempfile, make_tempfiles, upload_capture_mem_sync, benchmark
-import multiprocessing as mp
+from filesender.benchmark import make_tempfile, make_tempfiles, benchmark
 
 
 @pytest.mark.asyncio
@@ -25,7 +24,6 @@ async def test_round_trip(base_url: str, username: str, apikey: str, recipient: 
         transfer = await user_client.upload_workflow(
             files=[path], transfer_args={"recipients": [recipient], "from": username}
         )
-        path.unlink()
 
     download_client = FileSenderClient(base_url=base_url)
 
@@ -53,9 +51,16 @@ async def test_voucher_round_trip(
     )
 
     # Invite the guest
-    guest = await user_client.create_guest(
-        {"recipient": recipient, "from": username, "options": {"guest": guest_opts}}
-    )
+    guest = await user_client.create_guest({
+        "recipient": recipient,
+        "from": username,
+        "options": {
+            "guest": {
+                # See https://github.com/filesender/filesender/issues/1889
+                "can_only_send_to_me": True
+            },
+        }
+    })
 
     guest_auth = GuestAuth(guest_token=guest["token"])
     guest_client = FileSenderClient(
@@ -68,7 +73,9 @@ async def test_voucher_round_trip(
     with make_tempfile(size=1024**2, suffix=".dat") as path:
         # The guest uploads the file
         transfer = await guest_client.upload_workflow(
-            files=[path], transfer_args={"recipients": [username]}
+            files=[path],
+            # FileSender will accept basically any recipients array here, but the argument can't be missing
+            transfer_args={"recipients": []}
         )
 
     with tempfile.TemporaryDirectory() as download_dir:
