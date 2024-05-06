@@ -1,0 +1,642 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>Command Line Interface - FileSenderCLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#command-line-interface" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="FileSenderCLI" class="md-header__button md-logo" aria-label="FileSenderCLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FileSenderCLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Command Line Interface
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FileSenderCLI" class="md-nav__button md-logo" aria-label="FileSenderCLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    FileSenderCLI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Python API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Python%20API/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Python API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Python%20API/request_types/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Request Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Python%20API/response_types/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Response Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Python%20API/benchmark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmark Utilities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#filesender" class="md-nav__link">
+    <span class="md-ellipsis">
+      filesender
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="filesender">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download" class="md-nav__link">
+    <span class="md-ellipsis">
+      download
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invite" class="md-nav__link">
+    <span class="md-ellipsis">
+      invite
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      server-info
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-voucher" class="md-nav__link">
+    <span class="md-ellipsis">
+      upload-voucher
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="command-line-interface">Command Line Interface</h1>
+<h2 id="filesender">filesender</h2>
+<p>Usage:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">filesender</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="n">COMMAND</span> <span class="p">[</span><span class="n">ARGS</span><span class="p">]</span><span class="o">...</span>
+</span></code></pre></div>
+<p>Options:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>  <span class="o">--</span><span class="n">base</span><span class="o">-</span><span class="n">url</span> <span class="n">TEXT</span>                 <span class="n">The</span> <span class="n">URL</span> <span class="n">of</span> <span class="n">the</span> <span class="n">FileSender</span> <span class="n">REST</span> <span class="n">API</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                                  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  <span class="o">--</span><span class="n">version</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  <span class="o">--</span><span class="n">install</span><span class="o">-</span><span class="n">completion</span> <span class="p">[</span><span class="n">bash</span><span class="o">|</span><span class="n">zsh</span><span class="o">|</span><span class="n">fish</span><span class="o">|</span><span class="n">powershell</span><span class="o">|</span><span class="n">pwsh</span><span class="p">]</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                                  <span class="n">Install</span> <span class="n">completion</span> <span class="k">for</span> <span class="n">the</span> <span class="n">specified</span> <span class="n">shell</span><span class="o">.</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  <span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">completion</span> <span class="p">[</span><span class="n">bash</span><span class="o">|</span><span class="n">zsh</span><span class="o">|</span><span class="n">fish</span><span class="o">|</span><span class="n">powershell</span><span class="o">|</span><span class="n">pwsh</span><span class="p">]</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>                                  <span class="n">Show</span> <span class="n">completion</span> <span class="k">for</span> <span class="n">the</span> <span class="n">specified</span> <span class="n">shell</span><span class="p">,</span> <span class="n">to</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>                                  <span class="n">copy</span> <span class="n">it</span> <span class="ow">or</span> <span class="n">customize</span> <span class="n">the</span> <span class="n">installation</span><span class="o">.</span>
+</span></code></pre></div>
+<h3 id="download">download</h3>
+<p>Downloads all files associated with a transfer</p>
+<p>Usage:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">filesender</span> <span class="n">download</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="n">TOKEN</span>
+</span></code></pre></div>
+<p>Options:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>  <span class="n">TOKEN</span>                <span class="n">The</span> <span class="n">part</span> <span class="n">of</span> <span class="n">the</span> <span class="n">download</span> <span class="n">URL</span> <span class="n">after</span> <span class="s2">&quot;token=&quot;</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  <span class="o">--</span><span class="n">out</span><span class="o">-</span><span class="nb">dir</span> <span class="n">DIRECTORY</span>  <span class="n">Path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">directory</span> <span class="n">to</span> <span class="n">store</span> <span class="n">the</span> <span class="n">output</span> <span class="n">files</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                       <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">milton</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">Programming</span><span class="o">/</span><span class="n">FileSenderCli</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="invite">invite</h3>
+<p>Invites a user to send files to you</p>
+<p>Usage:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">filesender</span> <span class="n">invite</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="n">RECIPIENT</span>
+</span></code></pre></div>
+<p>Options:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>  <span class="o">--</span><span class="n">username</span> <span class="n">TEXT</span>                 <span class="n">Your</span> <span class="n">username</span><span class="o">.</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">username</span> <span class="n">of</span> <span class="n">the</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>                                  <span class="n">person</span> <span class="n">doing</span> <span class="n">the</span> <span class="n">inviting</span><span class="p">,</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">person</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>                                  <span class="n">being</span> <span class="n">invited</span><span class="o">.</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  <span class="o">--</span><span class="n">apikey</span> <span class="n">TEXT</span>                   <span class="n">Your</span> <span class="n">API</span> <span class="n">token</span><span class="o">.</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">token</span> <span class="n">of</span> <span class="n">the</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>                                  <span class="n">person</span> <span class="n">doing</span> <span class="n">the</span> <span class="n">inviting</span><span class="p">,</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">person</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>                                  <span class="n">being</span> <span class="n">invited</span><span class="o">.</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>  <span class="n">RECIPIENT</span>                       <span class="n">The</span> <span class="n">email</span> <span class="n">address</span> <span class="n">of</span> <span class="n">the</span> <span class="n">person</span> <span class="n">to</span> <span class="n">invite</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>                                  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>  <span class="o">--</span><span class="n">verbose</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">verbose</span>        <span class="n">Enable</span> <span class="n">more</span> <span class="n">detailed</span> <span class="n">outputs</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">no</span><span class="o">-</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>                                  <span class="n">verbose</span><span class="p">]</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>  <span class="o">--</span><span class="n">one</span><span class="o">-</span><span class="n">time</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">one</span><span class="o">-</span><span class="n">time</span>      <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">this</span> <span class="n">voucher</span> <span class="ow">is</span> <span class="n">only</span> <span class="n">valid</span> <span class="k">for</span> <span class="n">one</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>                                  <span class="n">use</span><span class="p">,</span> <span class="n">otherwise</span> <span class="n">it</span> <span class="n">can</span> <span class="n">be</span> <span class="n">re</span><span class="o">-</span><span class="n">used</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>                                  <span class="n">one</span><span class="o">-</span><span class="n">time</span><span class="p">]</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>  <span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">me</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">only</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">me</span>  <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">this</span> <span class="n">voucher</span> <span class="n">can</span> <span class="n">only</span> <span class="n">be</span> <span class="n">used</span> <span class="n">to</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>                                  <span class="n">send</span> <span class="n">files</span> <span class="n">to</span> <span class="n">you</span><span class="p">,</span> <span class="n">the</span> <span class="n">person</span> <span class="n">who</span> <span class="n">created</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>                                  <span class="n">this</span> <span class="n">voucher</span><span class="o">.</span> <span class="n">Otherwise</span> <span class="n">they</span> <span class="n">can</span> <span class="n">send</span> <span class="n">files</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>                                  <span class="n">to</span> <span class="nb">any</span> <span class="n">email</span> <span class="n">address</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">only</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">me</span><span class="p">]</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>  <span class="o">--</span><span class="n">email</span><span class="o">-</span><span class="n">upload</span><span class="o">-</span><span class="n">started</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">upload</span><span class="o">-</span><span class="n">started</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>                                  <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">an</span> <span class="n">email</span> <span class="n">will</span> <span class="n">be</span> <span class="n">sent</span> <span class="n">to</span> <span class="n">you</span><span class="p">,</span> <span class="n">when</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>                                  <span class="n">an</span> <span class="n">upload</span> <span class="n">to</span> <span class="n">this</span> <span class="n">voucher</span> <span class="n">starts</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>                                  <span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">upload</span><span class="o">-</span><span class="n">started</span><span class="p">]</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>  <span class="o">--</span><span class="n">email</span><span class="o">-</span><span class="n">page</span><span class="o">-</span><span class="n">access</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">page</span><span class="o">-</span><span class="n">access</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>                                  <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">an</span> <span class="n">email</span> <span class="n">will</span> <span class="n">be</span> <span class="n">sent</span> <span class="n">to</span> <span class="n">you</span> <span class="n">when</span>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>                                  <span class="n">the</span> <span class="n">guest</span> <span class="n">recipient</span> <span class="n">accesses</span> <span class="n">the</span> <span class="n">upload</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>                                  <span class="n">page</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">page</span><span class="o">-</span><span class="n">access</span><span class="p">]</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>  <span class="o">--</span><span class="n">email</span><span class="o">-</span><span class="n">guest</span><span class="o">-</span><span class="n">created</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">guest</span><span class="o">-</span><span class="n">created</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>                                  <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">send</span> <span class="n">an</span> <span class="n">email</span> <span class="n">to</span> <span class="n">the</span> <span class="n">guest</span> <span class="n">user</span> <span class="n">who</span>
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>                                  <span class="ow">is</span> <span class="n">being</span> <span class="n">invited</span> <span class="n">to</span> <span class="n">upload</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span>
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>                                  <span class="n">email</span><span class="o">-</span><span class="n">guest</span><span class="o">-</span><span class="n">created</span><span class="p">]</span>
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>  <span class="o">--</span><span class="n">email</span><span class="o">-</span><span class="n">receipt</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">receipt</span>
+</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>                                  <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">send</span> <span class="n">you</span> <span class="n">an</span> <span class="n">email</span> <span class="n">when</span> <span class="n">the</span> <span class="n">guest</span>
+</span><span id="__span-5-32"><a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>                                  <span class="n">account</span> <span class="ow">is</span> <span class="n">created</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">email</span><span class="o">-</span>
+</span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>                                  <span class="n">receipt</span><span class="p">]</span>
+</span><span id="__span-5-34"><a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>  <span class="o">--</span><span class="n">email</span><span class="o">-</span><span class="n">guest</span><span class="o">-</span><span class="n">expired</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">guest</span><span class="o">-</span><span class="n">expired</span>
+</span><span id="__span-5-35"><a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a>                                  <span class="n">If</span> <span class="n">true</span><span class="p">,</span> <span class="n">send</span> <span class="n">you</span> <span class="n">an</span> <span class="n">email</span> <span class="n">when</span> <span class="n">the</span> <span class="n">voucher</span>
+</span><span id="__span-5-36"><a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a>                                  <span class="n">expires</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">no</span><span class="o">-</span><span class="n">email</span><span class="o">-</span><span class="n">guest</span><span class="o">-</span><span class="n">expired</span><span class="p">]</span>
+</span><span id="__span-5-37"><a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>  <span class="o">--</span><span class="n">delay</span> <span class="n">N</span>                       <span class="n">Delay</span> <span class="n">the</span> <span class="n">signature</span> <span class="n">timestamp</span> <span class="n">by</span> <span class="n">N</span> <span class="n">seconds</span><span class="o">.</span>
+</span><span id="__span-5-38"><a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>                                  <span class="n">Increase</span> <span class="n">this</span> <span class="n">value</span> <span class="k">if</span> <span class="n">you</span> <span class="n">have</span> <span class="n">a</span> <span class="n">slow</span>
+</span><span id="__span-5-39"><a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>                                  <span class="n">connection</span><span class="o">.</span> <span class="n">This</span> <span class="n">value</span> <span class="n">should</span> <span class="n">be</span>
+</span><span id="__span-5-40"><a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>                                  <span class="n">approximately</span> <span class="n">the</span> <span class="n">time</span> <span class="n">it</span> <span class="n">takes</span> <span class="n">you</span> <span class="n">to</span>
+</span><span id="__span-5-41"><a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a>                                  <span class="n">upload</span> <span class="n">one</span> <span class="n">chunk</span> <span class="n">to</span> <span class="n">the</span> <span class="n">server</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span>
+</span><span id="__span-5-42"><a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>                                  <span class="mi">0</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="server-info">server-info</h3>
+<p>Prints out information about the FileSender server you are interfacing with</p>
+<p>Usage:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">filesender</span> <span class="n">server</span><span class="o">-</span><span class="n">info</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="upload">upload</h3>
+<p>Sends files to an email of choice</p>
+<p>Usage:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">filesender</span> <span class="n">upload</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="n">FILES</span><span class="o">...</span>
+</span></code></pre></div>
+<p>Options:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>  <span class="o">--</span><span class="n">username</span> <span class="n">TEXT</span>             <span class="n">Username</span> <span class="n">of</span> <span class="n">the</span> <span class="n">user</span> <span class="n">performing</span> <span class="n">the</span> <span class="n">upload</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>                              <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  <span class="o">--</span><span class="n">apikey</span> <span class="n">TEXT</span>               <span class="n">API</span> <span class="n">token</span> <span class="n">of</span> <span class="n">the</span> <span class="n">user</span> <span class="n">performing</span> <span class="n">the</span> <span class="n">upload</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>                              <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>  <span class="n">FILES</span><span class="o">...</span>                    <span class="n">Files</span> <span class="n">to</span> <span class="n">upload</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  <span class="o">--</span><span class="n">recipients</span> <span class="n">TEXT</span>           <span class="n">One</span> <span class="ow">or</span> <span class="n">more</span> <span class="n">email</span> <span class="n">addresses</span> <span class="n">to</span> <span class="n">send</span> <span class="n">the</span> <span class="n">files</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>                              <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  <span class="o">--</span><span class="n">verbose</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">verbose</span>    <span class="n">Enable</span> <span class="n">more</span> <span class="n">detailed</span> <span class="n">outputs</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">no</span><span class="o">-</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>                              <span class="n">verbose</span><span class="p">]</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  <span class="o">--</span><span class="n">concurrent</span><span class="o">-</span><span class="n">reads</span> <span class="n">INTEGER</span>  <span class="n">The</span> <span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">file</span> <span class="n">chunks</span> <span class="n">that</span> <span class="n">can</span> <span class="n">be</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>                              <span class="n">processed</span> <span class="n">at</span> <span class="n">a</span> <span class="n">time</span><span class="o">.</span> <span class="n">Reducing</span> <span class="n">this</span> <span class="n">number</span> <span class="n">will</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>                              <span class="n">decrease</span> <span class="n">the</span> <span class="n">memory</span> <span class="n">usage</span> <span class="n">of</span> <span class="n">the</span> <span class="n">application</span><span class="o">.</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>                              <span class="kc">None</span><span class="p">,</span> <span class="n">the</span> <span class="n">default</span> <span class="n">value</span><span class="p">,</span> <span class="n">sets</span> <span class="n">no</span> <span class="n">limit</span><span class="o">.</span> <span class="n">See</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>                              <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">wehi</span><span class="o">-</span><span class="n">researchcomputing</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">FileSen</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>                              <span class="n">derCli</span><span class="o">/</span><span class="n">benchmark</span> <span class="k">for</span> <span class="n">a</span> <span class="n">detailed</span> <span class="n">explanation</span> <span class="n">of</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>                              <span class="n">this</span> <span class="n">parameter</span><span class="o">.</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>  <span class="o">--</span><span class="n">concurrent</span><span class="o">-</span><span class="n">reqs</span> <span class="n">INTEGER</span>   <span class="n">The</span> <span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">API</span> <span class="n">requests</span> <span class="n">the</span> <span class="n">client</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>                              <span class="n">can</span> <span class="n">be</span> <span class="n">waiting</span> <span class="k">for</span> <span class="n">at</span> <span class="n">a</span> <span class="n">time</span><span class="o">.</span> <span class="n">Reducing</span> <span class="n">this</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>                              <span class="n">number</span> <span class="n">will</span> <span class="n">decrease</span> <span class="n">the</span> <span class="n">memory</span> <span class="n">usage</span> <span class="n">of</span> <span class="n">the</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>                              <span class="n">application</span><span class="o">.</span> <span class="kc">None</span><span class="p">,</span> <span class="n">the</span> <span class="n">default</span> <span class="n">value</span><span class="p">,</span> <span class="n">sets</span> <span class="n">no</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>                              <span class="n">limit</span><span class="o">.</span> <span class="n">See</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">wehi</span><span class="o">-</span><span class="n">researchcomputing</span><span class="o">.</span><span class="n">github</span>
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>                              <span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">FileSenderCli</span><span class="o">/</span><span class="n">benchmark</span> <span class="k">for</span> <span class="n">a</span> <span class="n">detailed</span>
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>                              <span class="n">explanation</span> <span class="n">of</span> <span class="n">this</span> <span class="n">parameter</span><span class="o">.</span>
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>  <span class="o">--</span><span class="n">chunk</span><span class="o">-</span><span class="n">size</span> <span class="n">INTEGER</span>        <span class="n">The</span> <span class="n">size</span> <span class="n">of</span> <span class="n">each</span> <span class="n">chunk</span> <span class="n">to</span> <span class="n">read</span> <span class="kn">from</span> <span class="nn">the</span> <span class="nb">input</span>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>                              <span class="n">file</span> <span class="n">during</span> <span class="n">the</span> <span class="n">upload</span> <span class="n">process</span><span class="o">.</span> <span class="n">Larger</span> <span class="n">values</span>
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>                              <span class="n">will</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">faster</span> <span class="n">upload</span> <span class="n">but</span> <span class="n">use</span> <span class="n">more</span>
+</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>                              <span class="n">memory</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">value</span> <span class="n">exceeds</span> <span class="n">the</span> <span class="n">server</span><span class="s1">&#39;s</span>
+</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>                              <span class="n">maximum</span> <span class="n">chunk</span> <span class="n">size</span><span class="p">,</span> <span class="n">this</span> <span class="n">command</span> <span class="n">will</span> <span class="n">fail</span><span class="o">.</span>
+</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>  <span class="o">--</span><span class="n">delay</span> <span class="n">N</span>                   <span class="n">Delay</span> <span class="n">the</span> <span class="n">signature</span> <span class="n">timestamp</span> <span class="n">by</span> <span class="n">N</span> <span class="n">seconds</span><span class="o">.</span>
+</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>                              <span class="n">Increase</span> <span class="n">this</span> <span class="n">value</span> <span class="k">if</span> <span class="n">you</span> <span class="n">have</span> <span class="n">a</span> <span class="n">slow</span>
+</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>                              <span class="n">connection</span><span class="o">.</span> <span class="n">This</span> <span class="n">value</span> <span class="n">should</span> <span class="n">be</span> <span class="n">approximately</span>
+</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>                              <span class="n">the</span> <span class="n">time</span> <span class="n">it</span> <span class="n">takes</span> <span class="n">you</span> <span class="n">to</span> <span class="n">upload</span> <span class="n">one</span> <span class="n">chunk</span> <span class="n">to</span> <span class="n">the</span>
+</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>                              <span class="n">server</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="upload-voucher">upload-voucher</h3>
+<p>Uploads files to a voucher that you have been invited to</p>
+<p>Usage:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">filesender</span> <span class="n">upload</span><span class="o">-</span><span class="n">voucher</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="n">FILES</span><span class="o">...</span>
+</span></code></pre></div>
+<p>Options:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>  <span class="n">FILES</span><span class="o">...</span>                    <span class="n">Files</span> <span class="n">to</span> <span class="n">upload</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  <span class="o">--</span><span class="n">guest</span><span class="o">-</span><span class="n">token</span> <span class="n">TEXT</span>          <span class="n">The</span> <span class="n">guest</span> <span class="n">token</span><span class="o">.</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">part</span> <span class="n">of</span> <span class="n">the</span> <span class="n">upload</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>                              <span class="n">URL</span> <span class="n">after</span> <span class="s1">&#39;vid=&#39;</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>  <span class="o">--</span><span class="n">email</span> <span class="n">TEXT</span>                <span class="n">The</span> <span class="n">email</span> <span class="n">address</span> <span class="n">that</span> <span class="n">was</span> <span class="n">invited</span> <span class="n">to</span> <span class="n">upload</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>                              <span class="n">files</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>  <span class="o">--</span><span class="n">concurrent</span><span class="o">-</span><span class="n">reads</span> <span class="n">INTEGER</span>  <span class="n">The</span> <span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">file</span> <span class="n">chunks</span> <span class="n">that</span> <span class="n">can</span> <span class="n">be</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>                              <span class="n">processed</span> <span class="n">at</span> <span class="n">a</span> <span class="n">time</span><span class="o">.</span> <span class="n">Reducing</span> <span class="n">this</span> <span class="n">number</span> <span class="n">will</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>                              <span class="n">decrease</span> <span class="n">the</span> <span class="n">memory</span> <span class="n">usage</span> <span class="n">of</span> <span class="n">the</span> <span class="n">application</span><span class="o">.</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>                              <span class="kc">None</span><span class="p">,</span> <span class="n">the</span> <span class="n">default</span> <span class="n">value</span><span class="p">,</span> <span class="n">sets</span> <span class="n">no</span> <span class="n">limit</span><span class="o">.</span> <span class="n">See</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>                              <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">wehi</span><span class="o">-</span><span class="n">researchcomputing</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">FileSen</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>                              <span class="n">derCli</span><span class="o">/</span><span class="n">benchmark</span> <span class="k">for</span> <span class="n">a</span> <span class="n">detailed</span> <span class="n">explanation</span> <span class="n">of</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>                              <span class="n">this</span> <span class="n">parameter</span><span class="o">.</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>  <span class="o">--</span><span class="n">concurrent</span><span class="o">-</span><span class="n">reqs</span> <span class="n">INTEGER</span>   <span class="n">The</span> <span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">API</span> <span class="n">requests</span> <span class="n">the</span> <span class="n">client</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>                              <span class="n">can</span> <span class="n">be</span> <span class="n">waiting</span> <span class="k">for</span> <span class="n">at</span> <span class="n">a</span> <span class="n">time</span><span class="o">.</span> <span class="n">Reducing</span> <span class="n">this</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>                              <span class="n">number</span> <span class="n">will</span> <span class="n">decrease</span> <span class="n">the</span> <span class="n">memory</span> <span class="n">usage</span> <span class="n">of</span> <span class="n">the</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>                              <span class="n">application</span><span class="o">.</span> <span class="kc">None</span><span class="p">,</span> <span class="n">the</span> <span class="n">default</span> <span class="n">value</span><span class="p">,</span> <span class="n">sets</span> <span class="n">no</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>                              <span class="n">limit</span><span class="o">.</span> <span class="n">See</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">wehi</span><span class="o">-</span><span class="n">researchcomputing</span><span class="o">.</span><span class="n">github</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>                              <span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">FileSenderCli</span><span class="o">/</span><span class="n">benchmark</span> <span class="k">for</span> <span class="n">a</span> <span class="n">detailed</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>                              <span class="n">explanation</span> <span class="n">of</span> <span class="n">this</span> <span class="n">parameter</span><span class="o">.</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>  <span class="o">--</span><span class="n">chunk</span><span class="o">-</span><span class="n">size</span> <span class="n">INTEGER</span>        <span class="n">The</span> <span class="n">size</span> <span class="n">of</span> <span class="n">each</span> <span class="n">chunk</span> <span class="n">to</span> <span class="n">read</span> <span class="kn">from</span> <span class="nn">the</span> <span class="nb">input</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>                              <span class="n">file</span> <span class="n">during</span> <span class="n">the</span> <span class="n">upload</span> <span class="n">process</span><span class="o">.</span> <span class="n">Larger</span> <span class="n">values</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>                              <span class="n">will</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">faster</span> <span class="n">upload</span> <span class="n">but</span> <span class="n">use</span> <span class="n">more</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>                              <span class="n">memory</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">value</span> <span class="n">exceeds</span> <span class="n">the</span> <span class="n">server</span><span class="s1">&#39;s</span>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>                              <span class="n">maximum</span> <span class="n">chunk</span> <span class="n">size</span><span class="p">,</span> <span class="n">this</span> <span class="n">command</span> <span class="n">will</span> <span class="n">fail</span><span class="o">.</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>  <span class="o">--</span><span class="n">verbose</span> <span class="o">/</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">verbose</span>    <span class="n">Enable</span> <span class="n">more</span> <span class="n">detailed</span> <span class="n">outputs</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">no</span><span class="o">-</span>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>                              <span class="n">verbose</span><span class="p">]</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>
