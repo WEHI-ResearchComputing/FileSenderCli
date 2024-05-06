@@ -1,5 +1,7 @@
 site_name: "FileSenderCLI"
 
+repo_url: https://github.com/WEHI-ResearchComputing/FileSenderCli
+
 nav:
   - index.md
   - Python API:
