@@ -4,12 +4,13 @@ repo_url: https://github.com/WEHI-ResearchComputing/FileSenderCli
 
 nav:
   - index.md
+  - 'Command Line Interface': cli.md
   - Python API:
     - Python API/index.md
     - Python API/request_types.md
     - Python API/response_types.md
     - Python API/benchmark.md
-  - changelog.md
+  - 'Changelog': changelog.md
   - 'Benchmark': benchmark.ipynb
 
 theme:
