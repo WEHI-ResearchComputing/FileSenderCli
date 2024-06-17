@@ -28,7 +28,7 @@ Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. 
 ConcurrentReads = Annotated[Optional[int], Option(help="The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
 ConcurrentReqs = Annotated[Optional[int], Option(help="The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
 
-context = {
+context: dict[Any, Any] = {
     "default_map": get_defaults()
 }
 app = Typer(name="filesender", pretty_exceptions_enable=False)

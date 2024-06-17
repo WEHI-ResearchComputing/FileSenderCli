@@ -94,8 +94,9 @@ class FileSenderClient:
         self.http_client = AsyncClient(timeout=None, follow_redirects=True)
         self.chunk_size = chunk_size
         # If we don't want a concurrency limit, we just use an infinitely large semaphore
-        self._read_sem = Semaphore(concurrent_reads or float("inf"))
-        self._req_sem = Semaphore(concurrent_requests or float("inf"))
+        # See: https://github.com/python/typeshed/issues/12147
+        self._read_sem = Semaphore(concurrent_reads or float("inf")) # type: ignore
+        self._req_sem = Semaphore(concurrent_requests or float("inf")) # type: ignore
 
     async def prepare(self) -> None:
         """
@@ -265,7 +266,7 @@ class FileSenderClient:
                 "token": token
             }
         )
-        files = set()
+        files: set[int] = set()
         for file in BeautifulSoup(download_page.content, "html.parser").find_all(class_="file"):
             files.add(int(file.attrs["data-id"]))
         return files
@@ -273,7 +274,7 @@ class FileSenderClient:
     async def download_files(
         self,
         token: str,
-        out_dir: Path
+        out_dir: Path,
     ) -> None:
         """
         Downloads all files for a transfer.
@@ -281,6 +282,7 @@ class FileSenderClient:
         Params:
             token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
             out_dir: The path to write the downloaded files.
+            key: 
         """
         async with TaskGroup() as tg:
             for file in await self._files_from_token(token):
@@ -296,7 +298,9 @@ class FileSenderClient:
         self,
         token: str,
         file_id: int,
-        out_dir: Path
+        out_dir: Path,
+        key: Optional[bytes] = None,
+        algorithm: Optional[str] = None
     ) -> None:
         """
         Downloads a single file.

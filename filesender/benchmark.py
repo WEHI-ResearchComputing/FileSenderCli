@@ -59,7 +59,7 @@ def make_tempfiles(size: int, n: int = 2, **kwargs: Any) -> Generator[list[Path]
         files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in range(n)]
         yield files
 
-async def upload_capture_mem(client_args: dict, upload_args: dict) -> BenchResult:
+async def upload_capture_mem(client_args: dict[str, Any], upload_args: dict[str, Any]) -> BenchResult:
     """
     Performs an upload, and returns the memory usage in doing so
     """
@@ -94,7 +94,7 @@ def benchmark(paths: list[Path], read_limit: Iterable[int | float], req_limit: I
     # We use multiprocessing so that each benchmark runs in a separate Python interpreter with a separate RSS
     # The spawn context ensures that no memory is shared with the controlling process
     with mp.get_context("spawn").Pool(processes=1) as pool:
-        args = [] 
+        args: list[tuple[Any, ...]] = [] 
         for concurrent_reads, concurrent_requests in zip(read_limit, req_limit):
             args.append(({
                     "base_url": base_url,
