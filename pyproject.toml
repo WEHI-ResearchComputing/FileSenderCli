@@ -7,7 +7,7 @@ name = "filesender-client"
 description = "FileSender Python CLI and API client"
 version = "1.2.1"
 readme = "README.rst"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 keywords = ["one", "two"]
 license = {text = "BSD-3-Clause"}
 classifiers = [
