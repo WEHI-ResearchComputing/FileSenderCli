@@ -222,7 +222,7 @@ class FileSenderClient:
                     self._upload_chunk(chunk=chunk, offset=offset, file_info=file_info)
                 )
         # Pause until all running tasks are finished
-        gather(*tasks)
+        await gather(*tasks)
 
     async def _upload_chunk(
         self,
@@ -294,7 +294,7 @@ class FileSenderClient:
             self.download_file(token=token, file_id=file, out_dir=out_dir)
             for file in await self._files_from_token(token)
         ]
-        gather(*tasks)
+        await gather(*tasks)
 
     async def download_file(
         self,
@@ -369,7 +369,7 @@ class FileSenderClient:
         # Upload each file in parallel
         # Note: update to TaskGroup once Python 3.10 is unsupported
         tasks = [self.upload_complete(file_info=file, path=files_by_name[file["name"]]) for file in transfer["files"]]
-        gather(*tasks)
+        await gather(*tasks)
 
         transfer = await self.update_transfer(
             transfer_id=transfer["id"], body={"complete": True}
