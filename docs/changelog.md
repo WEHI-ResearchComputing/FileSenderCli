@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.3.0
+
+### Changed
+
+* Support Python versions back until 3.8 [[#22]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/22)
+
 ## Version 1.2.1
 
 ### Changed

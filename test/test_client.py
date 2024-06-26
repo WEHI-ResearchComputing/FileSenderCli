@@ -103,7 +103,8 @@ async def test_guest_creation(
     )
 
     # Check that the options were acknowledged by the server
-    assert len(guest["options"]) == len(guest_opts)
+    for key, value in guest_opts.items():
+        assert guest["options"][key] == value
 
 
 @pytest.mark.asyncio
