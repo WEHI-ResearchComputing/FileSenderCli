@@ -5,7 +5,7 @@ import time
 from httpx import Request, QueryParams, AsyncClient
 from urllib.parse import urlparse, urlunparse, unquote
 from typing import Optional, TypeVar
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from collections.abc import Iterable
 import logging
 
@@ -93,7 +93,10 @@ class GuestAuth(Auth):
             }
         )
         soup = BeautifulSoup(res.content, 'html.parser')
-        self.security_token = soup.find("body").attrs["data-security-token"]
+        body = soup.find("body")
+        if not isinstance(body, Tag):
+            raise Exception("Invalid HTML document")
+        self.security_token = body.attrs["data-security-token"]
         self.csrf_token = res.cookies.get("csrfptoken")
         # We might already have the token, because we requested the server info earlier
         if self.csrf_token is None and "csrfptoken" in client.cookies:

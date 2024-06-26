@@ -1,5 +1,6 @@
-from typing import Any, List, Optional, Callable, ParamSpec, TypeVar, Coroutine
-from typing_extensions import Annotated
+from __future__ import annotations
+from typing import Any, List, Optional, Callable, Coroutine, Dict
+from typing_extensions import Annotated, ParamSpec, TypeVar
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context, Exit
 from rich import print
@@ -28,7 +29,7 @@ Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. 
 ConcurrentReads = Annotated[Optional[int], Option(help="The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
 ConcurrentReqs = Annotated[Optional[int], Option(help="The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
 
-context = {
+context: Dict[Any, Any] = {
     "default_map": get_defaults()
 }
 app = Typer(name="filesender", pretty_exceptions_enable=False)

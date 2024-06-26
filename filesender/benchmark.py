@@ -5,10 +5,10 @@ import resource
 import asyncio
 import time
 from contextlib import contextmanager, ExitStack
-from random import randbytes
+from secrets import token_bytes
 import tempfile
 from pathlib import Path
-from typing import Any, Generator, Iterable
+from typing import Any, Dict, Generator, Iterable, List, Tuple, Union
 from dataclasses import dataclass
 import multiprocessing as mp
 
@@ -34,13 +34,13 @@ def make_tempfile(size: int, **kwargs: Any) -> Generator[Path, Any, None]:
     """
     with tempfile.NamedTemporaryFile(mode="wb", delete=False, **kwargs) as file:
         path = Path(file.name)
-        file.write(randbytes(size))
+        file.write(token_bytes(size))
         file.close()
         yield Path(file.name)
         path.unlink()
     
 @contextmanager
-def make_tempfiles(size: int, n: int = 2, **kwargs: Any) -> Generator[list[Path], Any, None]:
+def make_tempfiles(size: int, n: int = 2, **kwargs: Any) -> Generator[List[Path], Any, None]:
     """
     Makes `n` temporary files of size `size` and yields them as a list via context manager.
     
@@ -59,7 +59,7 @@ def make_tempfiles(size: int, n: int = 2, **kwargs: Any) -> Generator[list[Path]
         files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in range(n)]
         yield files
 
-async def upload_capture_mem(client_args: dict, upload_args: dict) -> BenchResult:
+async def upload_capture_mem(client_args: Dict[str, Any], upload_args: Dict[str, Any]) -> BenchResult:
     """
     Performs an upload, and returns the memory usage in doing so
     """
@@ -78,7 +78,7 @@ async def upload_capture_mem(client_args: dict, upload_args: dict) -> BenchResul
 def upload_capture_mem_sync(*args: Any) -> BenchResult:
     return asyncio.run(upload_capture_mem(*args))
 
-def benchmark(paths: list[Path], read_limit: Iterable[int | float], req_limit: Iterable[int | float], base_url: str, username: str, apikey: str, recipient: str) -> list[BenchResult]:
+def benchmark(paths: List[Path], read_limit: Iterable[Union[int, float]], req_limit: Iterable[Union[int, float]], base_url: str, username: str, apikey: str, recipient: str) -> List[BenchResult]:
     """
     Runs a test upload using a variety of semaphore settings, and return one result for each.
 
@@ -94,7 +94,7 @@ def benchmark(paths: list[Path], read_limit: Iterable[int | float], req_limit: I
     # We use multiprocessing so that each benchmark runs in a separate Python interpreter with a separate RSS
     # The spawn context ensures that no memory is shared with the controlling process
     with mp.get_context("spawn").Pool(processes=1) as pool:
-        args = [] 
+        args: List[Tuple[Any, ...]] = [] 
         for concurrent_reads, concurrent_requests in zip(read_limit, req_limit):
             args.append(({
                     "base_url": base_url,
