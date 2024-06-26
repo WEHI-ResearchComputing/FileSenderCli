@@ -3,6 +3,7 @@ from typer.testing import CliRunner
 import tempfile
 from os import remove
 import pytest
+from typing import List
 
 runner = CliRunner()
 
@@ -10,7 +11,7 @@ runner = CliRunner()
     ["--no-one-time"],
     ["--no-only-to-me"],
 ])
-def test_guest_params(base_url: str, username: str, apikey: str, recipient: str, delay: int, guest_opts: list[str]):
+def test_guest_params(base_url: str, username: str, apikey: str, recipient: str, delay: int, guest_opts: List[str]):
     """
     This tests configuring some guest options using the CLI
     """

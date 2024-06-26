@@ -1,5 +1,6 @@
-from typing import Any, List, Optional, Callable, ParamSpec, TypeVar, Coroutine
-from typing_extensions import Annotated
+from __future__ import annotations
+from typing import Any, List, Optional, Callable, Coroutine
+from typing_extensions import Annotated, ParamSpec, TypeVar
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context, Exit
 from rich import print

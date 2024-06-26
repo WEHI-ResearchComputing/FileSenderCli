@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple, AsyncIterator
+from typing import Any, Coroutine, List, Optional, Tuple, AsyncIterator
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -6,7 +6,7 @@ from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
 from httpx import Request, AsyncClient, HTTPStatusError, RequestError
-from asyncio import TaskGroup, Semaphore
+from asyncio import Semaphore, gather
 import aiofiles
 from contextlib import contextmanager
 
@@ -34,7 +34,9 @@ def raise_status():
 
 async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes, int]]:
     """
-    Yields (chunk, offset) tuples from a file, chunked by chunk_size
+    Yields (chunk, offset) tuples from a file, chunked by chunk_size.
+    Each chunk is read in serial, so a single call to this will not be parallelised.
+    However, multiple files can be read in parallel by gathering multiple calls to this.
     """
     async with aiofiles.open(path, "rb") as fp:
         offset = 0
@@ -200,17 +202,18 @@ class FileSenderClient:
         if self.chunk_size is None:
             raise Exception(".prepare() has not been called!")
 
-        # Upload each chunk concurrently
-        async with TaskGroup() as tg:
-            async for chunk, offset in yield_chunks(path, self.chunk_size):
-                async with self._read_sem:
-                    tg.create_task(
-                        self._upload_chunk(
-                            chunk=chunk,
-                            offset=offset,
-                            file_info=file_info
-                        )
-                    )
+        tasks: List[Coroutine[None, None, None]] = []
+        # Each chunk is read synchronously since `async for` is effectively synchronous
+        async for chunk, offset in yield_chunks(path, self.chunk_size):
+            async with self._read_sem:
+                # However, the upload is not awaited, which allows them to run in parallel
+                tasks.append(self._upload_chunk(
+                    chunk=chunk,
+                    offset=offset,
+                    file_info=file_info
+                ))
+        # Pause until all running tasks are finished
+        gather(*tasks)
 
     async def _upload_chunk(
         self,
@@ -284,15 +287,15 @@ class FileSenderClient:
             out_dir: The path to write the downloaded files.
             key: 
         """
-        async with TaskGroup() as tg:
-            for file in await self._files_from_token(token):
-                tg.create_task(
+        # Each file is downloaded in parallel
+        gather(
+
                     self.download_file(
                         token=token,
                         file_id=file,
                         out_dir=out_dir
-                    )
-                )
+                    ) for file in await self._files_from_token(token)
+        )
 
     async def download_file(
         self,
@@ -367,12 +370,13 @@ class FileSenderClient:
         })
         self.http_client.params = self.http_client.params.set("roundtriptoken", transfer["roundtriptoken"])
         # Upload each file in parallel
-        async with TaskGroup() as tg:
-            for file in transfer["files"]:
-                tg.create_task(self.upload_complete(
-                    file_info=file,
-                    path=files_by_name[file["name"]]
-                ))
+        # Note: update to TaskGroup once Python 3.10 is unsupported
+        gather(
+            self.upload_complete(
+                file_info=file,
+                path=files_by_name[file["name"]]
+            ) for file in transfer["files"]
+        )
 
         transfer = await self.update_transfer(
             transfer_id=transfer["id"],

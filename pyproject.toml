@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "filesender-client"
 description = "FileSender Python CLI and API client"
 version = "1.2.1"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["one", "two"]
 license = {text = "BSD-3-Clause"}
@@ -21,8 +21,12 @@ dependencies = [
     "aiofiles",
     # See: https://github.com/encode/httpcore/pull/883
     "httpcore >= 1.0.3",
-    "cryptography"
+    "cryptography",
+    "typing_extensions"
 ]
+
+[tool.setuptools.packages.find]
+exclude = ["site"]
 
 [project.optional-dependencies]
 dev = [
