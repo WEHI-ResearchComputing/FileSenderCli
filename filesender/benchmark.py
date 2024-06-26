@@ -5,10 +5,10 @@ import resource
 import asyncio
 import time
 from contextlib import contextmanager, ExitStack
-from random import randbytes
+from secrets import token_bytes
 import tempfile
 from pathlib import Path
-from typing import Any, Generator, Iterable, List, Tuple, Union
+from typing import Any, Dict, Generator, Iterable, List, Tuple, Union
 from dataclasses import dataclass
 import multiprocessing as mp
 
@@ -34,7 +34,7 @@ def make_tempfile(size: int, **kwargs: Any) -> Generator[Path, Any, None]:
     """
     with tempfile.NamedTemporaryFile(mode="wb", delete=False, **kwargs) as file:
         path = Path(file.name)
-        file.write(randbytes(size))
+        file.write(token_bytes(size))
         file.close()
         yield Path(file.name)
         path.unlink()
@@ -59,7 +59,7 @@ def make_tempfiles(size: int, n: int = 2, **kwargs: Any) -> Generator[List[Path]
         files = [stack.enter_context(make_tempfile(size=size, **kwargs)) for _ in range(n)]
         yield files
 
-async def upload_capture_mem(client_args: dict[str, Any], upload_args: dict[str, Any]) -> BenchResult:
+async def upload_capture_mem(client_args: Dict[str, Any], upload_args: Dict[str, Any]) -> BenchResult:
     """
     Performs an upload, and returns the memory usage in doing so
     """

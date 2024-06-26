@@ -1,4 +1,4 @@
-from typing import Any, Coroutine, List, Optional, Tuple, AsyncIterator
+from typing import Any, Coroutine, List, Optional, Tuple, AsyncIterator, Set
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -258,7 +258,7 @@ class FileSenderClient:
             json=body
         ))
 
-    async def _files_from_token(self, token: str) -> set[int]:
+    async def _files_from_token(self, token: str) -> Set[int]:
         """
         Internal function that returns a list of file IDs for a given guest token
         """
@@ -269,7 +269,7 @@ class FileSenderClient:
                 "token": token
             }
         )
-        files: set[int] = set()
+        files: Set[int] = set()
         for file in BeautifulSoup(download_page.content, "html.parser").find_all(class_="file"):
             files.add(int(file.attrs["data-id"]))
         return files

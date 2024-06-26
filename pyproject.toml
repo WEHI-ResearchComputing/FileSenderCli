@@ -26,7 +26,7 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-exclude = ["site"]
+exclude = ["site", "test"]
 
 [project.optional-dependencies]
 dev = [
