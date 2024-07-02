@@ -36,6 +36,34 @@ async def test_round_trip(base_url: str, username: str, apikey: str, recipient: 
         )
         assert len(list(Path(download_dir).iterdir())) == 1
 
+    
+@pytest.mark.asyncio
+async def test_round_trip_dir(base_url: str, username: str, apikey: str, recipient: str):
+    """
+    This tests uploading two 1MB files in a directory
+    """
+
+    user_client = FileSenderClient(
+        base_url=base_url, auth=UserAuth(api_key=apikey, username=username)
+    )
+    await user_client.prepare()
+
+    with tempfile.TemporaryDirectory() as tempdir:
+        with make_tempfiles(size=1024**2, n=2, suffix=".dat", dir = tempdir) as paths:
+            # The user uploads the entire directory
+            transfer = await user_client.upload_workflow(
+                files=[Path(tempdir)], transfer_args={"recipients": [recipient], "from": username}
+            )
+
+    download_client = FileSenderClient(base_url=base_url)
+
+    with tempfile.TemporaryDirectory() as download_dir:
+        await download_client.download_files(
+            token=transfer["recipients"][0]["token"],
+            out_dir=Path(download_dir),
+        )
+        assert len(list(Path(download_dir).iterdir())) == 2
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("guest_opts", [{}, {"can_only_send_to_me": False}])

@@ -1,4 +1,4 @@
-from typing import Any, Coroutine, List, Optional, Tuple, AsyncIterator, Set
+from typing import Any, Coroutine, Iterable, List, Optional, Tuple, AsyncIterator, Set
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -54,6 +54,26 @@ async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes
             yield chunk, offset
             offset += len(chunk)
 
+def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[Tuple[str, Path]]:
+    """
+    Recursively yields (name, path) tuples for all files included in the input path, or that are children of these paths
+    """
+    for path in paths:
+        if path.is_dir():
+            # Recurse into directories
+            if root is None:
+                # If this is a top level directory, then its parent becomes the root
+                yield from iter_files(path.iterdir(), root = path.parent)
+            else:
+                # Preserve the same root when recursing
+                yield from iter_files(path.iterdir(), root = root)
+        else:
+            if root is None:
+                # If this is a top level file, just use the filename directly
+                yield path.name, path
+            else:
+                # If this is a nested file, use the relative path from the root directory as the name
+                yield str(path.relative_to(root)), path
 
 class FileSenderClient:
     """
@@ -266,6 +286,7 @@ class FileSenderClient:
         """
         Internal function that returns a list of file IDs for a given guest token
         """
+        # TODO: update this to use new API, as we need the full file path, not just file names here
         download_page = await self.http_client.get(
             "https://filesender.aarnet.edu.au", params={"s": "download", "token": token}
         )
@@ -345,17 +366,17 @@ class FileSenderClient:
         High level function for uploading one or more files
 
         Args:
-            files: A list of files to upload.
+            files: A list of files and/or directories to upload.
             transfer_args: Additional options to include when creating the transfer, for example a subject or message. See [`PartialTransfer`][filesender.request_types.PartialTransfer].
 
         Returns:
             : See [`Transfer`][filesender.response_types.Transfer]
         """
-        files_by_name = {path.name: path for path in files}
+        files_by_name = {key: value for key, value in iter_files(files)}
         transfer = await self.create_transfer(
             {
                 "files": [
-                    {"name": file.name, "size": file.stat().st_size} for file in files
+                    {"name": name, "size": file.stat().st_size} for name, file in files_by_name.items()
                 ],
                 "options": {
                     "email_download_complete": True,
@@ -368,7 +389,12 @@ class FileSenderClient:
         )
         # Upload each file in parallel
         # Note: update to TaskGroup once Python 3.10 is unsupported
-        tasks = [self.upload_complete(file_info=file, path=files_by_name[file["name"]]) for file in transfer["files"]]
+        tasks = [
+            self.upload_complete(file_info=file, path=files_by_name[file["name"]])
+            for file in transfer["files"]
+            # Skip folders, which aren't real
+            if file["name"] in files_by_name
+        ]
         await gather(*tasks)
 
         transfer = await self.update_transfer(
