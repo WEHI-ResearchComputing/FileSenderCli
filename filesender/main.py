@@ -28,6 +28,7 @@ Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
 Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. Increase this value if you have a slow connection. This value should be approximately the time it takes you to upload one chunk to the server.", metavar="N")]
 ConcurrentReads = Annotated[Optional[int], Option(help="The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
 ConcurrentReqs = Annotated[Optional[int], Option(help="The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
+UploadFiles = Annotated[List[Path], Argument(file_okay=True, dir_okay=True, resolve_path=True, exists=True, help="Files and/or directories to upload")]
 
 context: Dict[Any, Any] = {
     "default_map": get_defaults()
@@ -106,7 +107,7 @@ def invite(
 @app.command(context_settings=context)
 @typer_async
 async def upload_voucher(
-    files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
+    files: UploadFiles,
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
     context: Context,
@@ -138,7 +139,7 @@ async def upload_voucher(
 async def upload(
     username: Annotated[str, Option(help="Username of the user performing the upload")],
     apikey: Annotated[str, Option(help="API token of the user performing the upload")],
-    files: Annotated[List[Path], Argument(file_okay=True, dir_okay=False, resolve_path=True, exists=True, help="Files to upload")],
+    files: UploadFiles,
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
     verbose: Verbose = False,
