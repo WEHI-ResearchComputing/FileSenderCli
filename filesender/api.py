@@ -300,15 +300,16 @@ class FileSenderClient:
     async def download_files(
         self,
         token: str,
-        out_dir: Path,
+        out_dir: Path
     ) -> None:
         """
         Downloads all files for a transfer.
+         
+        Note that currently the directory hierarchy won't be preserved. So if the original user uploaded `dir_a/file_a.txt` and `dir_b/file_b.txt`, they will simply be downloaded as `file_a.txt` and `file_b.txt` with their directories stripped out. This is a limitation of the current API. See https://github.com/filesender/filesender/issues/1555 for context.
 
         Params:
             token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
             out_dir: The path to write the downloaded files.
-            key:
         """
         # Each file is downloaded in parallel
         tasks = [
