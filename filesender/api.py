@@ -286,7 +286,6 @@ class FileSenderClient:
         """
         Internal function that returns a list of file IDs for a given guest token
         """
-        # TODO: update this to use new API, as we need the full file path, not just file names here
         download_page = await self.http_client.get(
             "https://filesender.aarnet.edu.au", params={"s": "download", "token": token}
         )
