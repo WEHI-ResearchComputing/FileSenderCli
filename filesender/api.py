@@ -1,4 +1,5 @@
-from typing import Any, Coroutine, Iterable, List, Optional, Tuple, AsyncIterator, Set
+import ssl
+from typing import Any, Callable, Coroutine, Generator, Iterable, List, Optional, Tuple, AsyncIterator, Set
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -8,8 +9,11 @@ from pathlib import Path
 from httpx import Request, AsyncClient, HTTPStatusError, RequestError
 from asyncio import Semaphore, gather
 import aiofiles
+from aiostream import pipe, stream
 from contextlib import contextmanager
+import aiostream
 
+ProgressHook = Optional[Callable[[int, int], None]]
 
 def url_without_scheme(url: str) -> str:
     """
@@ -29,11 +33,14 @@ def raise_status():
     """
     try:
         yield
+    except ssl.SSLWantReadError:
+        pass
     except HTTPStatusError as e:
         raise Exception(
             f"Request failed with content {e.response.text} for request {e.request.method} {e.request.url}"
         ) from e
     except RequestError as e:
+        # TODO: check for SSL read error
         raise Exception(
             f"Request failed for request {e.request.method} {e.request.url}"
         ) from e
@@ -88,18 +95,16 @@ class FileSenderClient:
     auth: Auth
     # Session to use for all HTTP requests
     http_client: AsyncClient
-    #: Limits concurrent reads
-    _read_sem: Semaphore
-    #: Limits concurrent requests
-    _req_sem: Semaphore
+    concurrent_files: Optional[int]
+    concurrent_chunks: Optional[int]
 
     def __init__(
         self,
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        concurrent_reads: Optional[int] = None,
-        concurrent_requests: Optional[int] = None,
+        concurrent_files: Optional[int] = None,
+        concurrent_chunks: Optional[int] = None,
     ):
         """
         Args:
@@ -124,10 +129,8 @@ class FileSenderClient:
         # FileSender seems to sometimes use redirects
         self.http_client = AsyncClient(timeout=None, follow_redirects=True)
         self.chunk_size = chunk_size
-        # If we don't want a concurrency limit, we just use an infinitely large semaphore
-        # See: https://github.com/python/typeshed/issues/12147
-        self._read_sem = Semaphore(concurrent_reads or float("inf"))  # type: ignore
-        self._req_sem = Semaphore(concurrent_requests or float("inf"))  # type: ignore
+        self.concurrent_chunks = concurrent_chunks
+        self.concurrent_files = concurrent_files
 
     async def prepare(self) -> None:
         """
@@ -147,10 +150,9 @@ class FileSenderClient:
         Signs a request and sends it, returning the JSON result
         """
         self.auth.sign(request, self.http_client)
-        async with self._req_sem:
-            with raise_status():
-                res = await self.http_client.send(request)
-                res.raise_for_status()
+        with raise_status():
+            res = await self.http_client.send(request)
+            res.raise_for_status()
         return res.json()
 
     async def create_transfer(
@@ -221,7 +223,7 @@ class FileSenderClient:
             )
         )
 
-    async def upload_file(self, file_info: response.File, path: Path) -> None:
+    async def upload_file(self, file_info: response.File, path: Path, progress_hook: ProgressHook = None) -> AsyncIterator[None]:
         """
         Uploads a file, with multiple chunks being uploaded in parallel
         Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
@@ -229,20 +231,30 @@ class FileSenderClient:
         Params:
             file_info: Identifier obtained from the result of [`create_transfer`][filesender.FileSenderClient.create_transfer]
             path: File path to the file to be uploaded
+            progress_hook: An optional function with the signature (bytes_sent: int, total_bytes: int) that will be called after each chunk
+
+        Returns: An async generator. You can force the uploads to occur using `list()`.
         """
         if self.chunk_size is None:
             raise Exception(".prepare() has not been called!")
 
-        tasks: List[Coroutine[None, None, None]] = []
-        # Each chunk is read synchronously since `async for` is effectively synchronous
-        async for chunk, offset in yield_chunks(path, self.chunk_size):
-            async with self._read_sem:
-                # However, the upload is not awaited, which allows them to run in parallel
-                tasks.append(
-                    self._upload_chunk(chunk=chunk, offset=offset, file_info=file_info)
-                )
-        # Pause until all running tasks are finished
-        await gather(*tasks)
+        async def _task_generator(chunk_size: int) -> AsyncIterator[Tuple[response.File, int, bytes]]:
+            async for chunk, offset in yield_chunks(path, chunk_size):
+                yield file_info, offset, chunk
+
+        # progress = 0
+        async with (
+            stream.iterate(
+                _task_generator(self.chunk_size)
+            ) | pipe.starmap(
+            self._upload_chunk,
+            task_limit=2
+        )).stream() as streamer:
+            async for _ in streamer:
+                pass
+                # if progress_hook is not None:
+                #     progress += self.chunk_size
+                #     progress_hook(progress, file_info["size"])
 
     async def _upload_chunk(
         self,
@@ -360,7 +372,7 @@ class FileSenderClient:
         return (await self.http_client.get(f"{self.base_url}/info")).json()
 
     async def upload_workflow(
-        self, files: List[Path], transfer_args: request.PartialTransfer = {}
+        self, files: List[Path], transfer_args: request.PartialTransfer = {}, progress_hook: ProgressHook = None
     ) -> response.Transfer:
         """
         High level function for uploading one or more files
@@ -368,44 +380,53 @@ class FileSenderClient:
         Args:
             files: A list of files and/or directories to upload.
             transfer_args: Additional options to include when creating the transfer, for example a subject or message. See [`PartialTransfer`][filesender.request_types.PartialTransfer].
+            progress_hook: An optional function that takes (current_bytes, total_bytes), which is called periodically, for example to update a progress bar.
 
         Returns:
             : See [`Transfer`][filesender.response_types.Transfer]
         """
         files_by_name = {key: value for key, value in iter_files(files)}
+        file_info: List[request.File] = [{"name": name, "size": file.stat().st_size} for name, file in files_by_name.items()]
         transfer = await self.create_transfer(
             {
-                "files": [
-                    {"name": name, "size": file.stat().st_size} for name, file in files_by_name.items()
-                ],
+                "files": file_info,
                 "options": {
                     "email_download_complete": True,
                 },
                 **transfer_args,
             }
         )
+        current_bytes: int = 0
+        total_bytes = sum(file["size"] for file in file_info)
         self.http_client.params = self.http_client.params.set(
             "roundtriptoken", transfer["roundtriptoken"]
         )
-        # Upload each file in parallel
-        # Note: update to TaskGroup once Python 3.10 is unsupported
-        tasks = [
-            self.upload_complete(file_info=file, path=files_by_name[file["name"]])
-            for file in transfer["files"]
-            # Skip folders, which aren't real
-            if file["name"] in files_by_name
-        ]
-        await gather(*tasks)
+        # Adapter hook that applies to the entire transfer, not just one file
+        def _progress_hook(bytes: int, total: int):
+            nonlocal current_bytes
+            if progress_hook is not None:
+                current_bytes += self.chunk_size
+                progress_hook(current_bytes, total_bytes)
 
+        async def _upload_args() -> AsyncIterator[tuple[request.File, Path, ProgressHook]]:
+            for file in transfer["files"]:
+            # Skip folders, which aren't real
+                if file["name"] in files_by_name:
+                    yield file, files_by_name[file["name"]], _progress_hook
+
+        # Upload each file in parallel
+        await aiostream.stream.starmap(_upload_args(), self.upload_complete, ordered=False, task_limit=self.concurrent_files)
+
+        # Mark the transfer as complete
         transfer = await self.update_transfer(
             transfer_id=transfer["id"], body={"complete": True}
         )
         return transfer
 
-    async def upload_complete(self, file_info: response.File, path: Path) -> None:
+    async def upload_complete(self, file_info: response.File, path: Path, progress_hook: ProgressHook = None) -> None:
         """
         Uploads a file and marks the upload as complete.
         Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
         """
-        await self.upload_file(file_info=file_info, path=path)
+        await self.upload_file(file_info=file_info, path=path, progress_hook=progress_hook)
         await self.update_file(file_info=file_info, body={"complete": True})

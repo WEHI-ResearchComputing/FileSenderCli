@@ -26,8 +26,8 @@ def typer_async(f: Callable[P, Coroutine[Any, Any, T]]):
 ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
 Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
 Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. Increase this value if you have a slow connection. This value should be approximately the time it takes you to upload one chunk to the server.", metavar="N")]
-ConcurrentReads = Annotated[Optional[int], Option(help="The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
-ConcurrentReqs = Annotated[Optional[int], Option(help="The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
+ConcurrentFiles = Annotated[Optional[int], Option(help="The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
+ConcurrentChunks = Annotated[Optional[int], Option(help="The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
 UploadFiles = Annotated[List[Path], Argument(file_okay=True, dir_okay=True, resolve_path=True, exists=True, help="Files and/or directories to upload")]
 
 context: Dict[Any, Any] = {
@@ -111,8 +111,8 @@ async def upload_voucher(
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
     context: Context,
-    concurrent_reads: ConcurrentReads = None,
-    concurrent_reqs: ConcurrentReqs = None,
+    concurrent_files: ConcurrentFiles = None,
+    concurrent_chunks: ConcurrentChunks = None,
     chunk_size: ChunkSize = None,
     verbose: Verbose = False
 ):
@@ -124,8 +124,8 @@ async def upload_voucher(
         auth=auth,
         base_url=context.obj["base_url"],
         chunk_size = chunk_size,
-        concurrent_reads=concurrent_reads,
-        concurrent_requests=concurrent_reqs
+        concurrent_files=concurrent_files,
+        concurrent_chunks=concurrent_chunks
     )
     await auth.prepare(client.http_client)
     await client.prepare()
@@ -143,8 +143,8 @@ async def upload(
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
     verbose: Verbose = False,
-    concurrent_reads: ConcurrentReads = None,
-    concurrent_reqs: ConcurrentReqs = None,
+    concurrent_files: ConcurrentFiles = None,
+    concurrent_chunks: ConcurrentChunks = None,
     chunk_size: ChunkSize = None,
     delay: Delay = 0
 ):
@@ -159,8 +159,8 @@ async def upload(
         ),
         base_url=context.obj["base_url"],
         chunk_size=chunk_size,
-        concurrent_reads=concurrent_reads,
-        concurrent_requests=concurrent_reqs
+        concurrent_files=concurrent_files,
+        concurrent_chunks=concurrent_chunks
     )
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"recipients": recipients, "from": username})
