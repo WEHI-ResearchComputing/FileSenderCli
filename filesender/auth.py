@@ -69,7 +69,7 @@ class UserAuth(Auth):
         else:
             raise Exception("?")
 
-        request.url = request.url.copy_add_param("signature", signature.hexdigest())
+        request.url = request.url.copy_remove_param("signature").copy_add_param("signature", signature.hexdigest())
         return request
 
 @dataclass(unsafe_hash=True)

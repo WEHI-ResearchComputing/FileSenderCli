@@ -5,10 +5,27 @@ import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
-from httpx import Request, AsyncClient, HTTPStatusError, RequestError
+from httpx import Request, AsyncClient, HTTPStatusError, RequestError, ReadError
 from asyncio import TaskGroup, Semaphore
 import aiofiles
 from contextlib import contextmanager
+from tenacity import AsyncRetrying, RetryError, retry, retry_if_exception_type, stop_after_attempt, wait_fixed, retry_if_exception
+# from httpcore import ReadError
+
+def should_retry(e: BaseException) -> bool:
+    """
+    Returns True if the exception is a transient exception from the FileSender server,
+    that can be retried.
+    """
+    if isinstance(e, ReadError):
+        # Seems to be just a bug in the backend
+        # https://github.com/encode/httpx/discussions/2941 
+        return True
+    elif isinstance(e, HTTPStatusError) and e.response.status_code == 500 and e.response.json()["message"] == "auth_remote_too_late":
+        # These errors are caused by lag between creating the response and it being received
+        return True
+    return False
+
 
 def url_without_scheme(url: str) -> str:
     """
@@ -97,6 +114,7 @@ class FileSenderClient:
         self._read_sem = Semaphore(concurrent_reads or float("inf"))
         self._req_sem = Semaphore(concurrent_requests or float("inf"))
 
+
     async def prepare(self) -> None:
         """
         Checks that the chunk size is appropriate and/or sets the chunk size based on the server info.
@@ -108,15 +126,21 @@ class FileSenderClient:
         elif self.chunk_size > info["upload_chunk_size"]:
             raise Exception(f"--chunk-size can't be greater than the server's maximum supported chunk size. For this server, the maximum is {info['upload_chunk_size']}")
 
+    # @retry(retry=retry_if_exception_type(ReadError), wait=wait_fixed(0.1))
     async def _sign_send(self, request: Request) -> Any:
         """
         Signs a request and sends it, returning the JSON result
         """
-        self.auth.sign(request, self.http_client)
         async with self._req_sem:
-            with raise_status():
-                res = await self.http_client.send(request)
-                res.raise_for_status()
+            try:
+                with raise_status():
+                    async for attempt in AsyncRetrying(retry=retry_if_exception(should_retry), wait=wait_fixed(0.1), stop=stop_after_attempt(5)):
+                        with attempt:
+                            self.auth.sign(request, self.http_client)
+                            res = await self.http_client.send(request)
+                            res.raise_for_status()
+            except RetryError:
+                pass
         return res.json()
 
     async def create_transfer(
