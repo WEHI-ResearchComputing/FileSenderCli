@@ -24,7 +24,8 @@ dependencies = [
     # See: https://github.com/encode/httpcore/pull/883
     "httpcore >= 1.0.3",
     "cryptography",
-    "typing_extensions"
+    "typing_extensions",
+    "tenacity"
 ]
 
 [tool.setuptools.packages.find]

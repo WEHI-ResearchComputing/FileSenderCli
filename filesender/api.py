@@ -6,14 +6,11 @@ import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
-from httpx import Request, AsyncClient, HTTPStatusError, RequestError
+from httpx import Request, AsyncClient, HTTPStatusError, RequestError, ReadError
 from asyncio import Semaphore, gather
 import aiofiles
 from aiostream import pipe, stream
 from contextlib import contextmanager
-import aiostream
-
-ProgressHook = Optional[Callable[[int, int], None]]
 
 def url_without_scheme(url: str) -> str:
     """
@@ -132,6 +129,7 @@ class FileSenderClient:
         self.concurrent_chunks = concurrent_chunks
         self.concurrent_files = concurrent_files
 
+
     async def prepare(self) -> None:
         """
         Checks that the chunk size is appropriate and/or sets the chunk size based on the server info.
@@ -145,14 +143,16 @@ class FileSenderClient:
                 f"--chunk-size can't be greater than the server's maximum supported chunk size. For this server, the maximum is {info['upload_chunk_size']}"
             )
 
+    # @retry(retry=retry_if_exception_type(ReadError), wait=wait_fixed(0.1))
     async def _sign_send(self, request: Request) -> Any:
         """
         Signs a request and sends it, returning the JSON result
         """
         self.auth.sign(request, self.http_client)
-        with raise_status():
-            res = await self.http_client.send(request)
-            res.raise_for_status()
+        async with self._req_sem:
+            with raise_status():
+                res = await self.http_client.send(request)
+                res.raise_for_status()
         return res.json()
 
     async def create_transfer(
