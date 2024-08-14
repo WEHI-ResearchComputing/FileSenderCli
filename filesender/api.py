@@ -344,7 +344,7 @@ class FileSenderClient:
 
         file_ids = await self._files_from_token(token)
 
-        async def _download_args() -> AsyncIterator[tuple[str, Any, Path]]:
+        async def _download_args() -> AsyncIterator[Tuple[str, Any, Path]]:
             "Yields tuples of arguments to pass to download_file"
             for file_id in file_ids:
                 yield token, file_id, out_dir
@@ -422,7 +422,7 @@ class FileSenderClient:
             "roundtriptoken", transfer["roundtriptoken"]
         )
 
-        async def _upload_args() -> AsyncIterator[tuple[response.File, Path]]:
+        async def _upload_args() -> AsyncIterator[Tuple[response.File, Path]]:
             for file in transfer["files"]:
             # Skip folders, which aren't real
                 if file["name"] in files_by_name:
