@@ -350,7 +350,8 @@ class FileSenderClient:
                 yield token, file_id, out_dir
 
         # Each file is downloaded in parallel
-        await stream.starmap(_download_args(), self.download_file, task_limit=self.concurrent_files)
+        # Pyright messes this up
+        await stream.starmap(_download_args(), self.download_file, task_limit=self.concurrent_files) # type: ignore
 
     async def download_file(
         self,
