@@ -350,7 +350,7 @@ class FileSenderClient:
                 yield token, file_id, out_dir
 
         # Each file is downloaded in parallel
-        await (stream.iterate(_download_args()) | pipe.starmap(self.download_file, task_limit=self.concurrent_files))
+        await stream.starmap(_download_args(), self.download_file, task_limit=self.concurrent_files)
 
     async def download_file(
         self,
@@ -421,11 +421,11 @@ class FileSenderClient:
             "roundtriptoken", transfer["roundtriptoken"]
         )
 
-        async def _upload_args() -> AsyncIterator[tuple[request.File, Path]]:
+        async def _upload_args() -> AsyncIterator[tuple[response.File, Path]]:
             for file in transfer["files"]:
             # Skip folders, which aren't real
                 if file["name"] in files_by_name:
-                    # Pyright seems to not understand the 
+                    # Pyright seems to not understand that some fields are optional
                     yield file, files_by_name[file["name"]]
 
         # Upload each file in parallel

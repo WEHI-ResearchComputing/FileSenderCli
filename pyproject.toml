@@ -58,3 +58,4 @@ filesender = "filesender.main:app"
 typeCheckingMode = "strict"
 exclude = ["venv", "test"]
 reportUnknownMemberType = false
+reportUnknownVariableType = false
