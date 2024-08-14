@@ -9,7 +9,7 @@ from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
 from functools import wraps
 from asyncio import run
-import pkg_resources
+from importlib.metadata import version
 
 from filesender.response_types import Guest, Transfer
 
@@ -36,8 +36,8 @@ app = Typer(name="filesender", pretty_exceptions_enable=False)
 
 def version_callback(value: bool):
     if value:
-            print(pkg_resources.require("filesender-client")[0].version)
-            raise Exit()
+        print(version("filesender-client"))
+        raise Exit()
 
 
 @app.callback(context_settings=context)
