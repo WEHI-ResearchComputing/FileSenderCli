@@ -1,14 +1,34 @@
-from typing import Any, Coroutine, Iterable, List, Optional, Tuple, AsyncIterator, Set
+from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Set
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
-from httpx import Request, AsyncClient, HTTPStatusError, RequestError
-from asyncio import Semaphore, gather
+from httpx import Request, AsyncClient, HTTPStatusError, RequestError, ReadError
+import math
 import aiofiles
+from aiostream import stream
 from contextlib import contextmanager
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception
+import logging
+from tqdm.asyncio import tqdm
+
+logger = logging.getLogger(__name__)
+
+def should_retry(e: BaseException) -> bool:
+    """
+    Returns True if the exception is a transient exception from the FileSender server,
+    that can be retried.
+    """
+    if isinstance(e, ReadError):
+        # Seems to be just a bug in the backend
+        # https://github.com/encode/httpx/discussions/2941 
+        return True
+    elif isinstance(e, HTTPStatusError) and e.response.status_code == 500 and e.response.json()["message"] == "auth_remote_too_late":
+        # These errors are caused by lag between creating the response and it being received
+        return True
+    return False
 
 
 def url_without_scheme(url: str) -> str:
@@ -34,6 +54,7 @@ def raise_status():
             f"Request failed with content {e.response.text} for request {e.request.method} {e.request.url}"
         ) from e
     except RequestError as e:
+        # TODO: check for SSL read error
         raise Exception(
             f"Request failed for request {e.request.method} {e.request.url}"
         ) from e
@@ -88,18 +109,16 @@ class FileSenderClient:
     auth: Auth
     # Session to use for all HTTP requests
     http_client: AsyncClient
-    #: Limits concurrent reads
-    _read_sem: Semaphore
-    #: Limits concurrent requests
-    _req_sem: Semaphore
+    concurrent_files: Optional[int]
+    concurrent_chunks: Optional[int]
 
     def __init__(
         self,
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        concurrent_reads: Optional[int] = None,
-        concurrent_requests: Optional[int] = None,
+        concurrent_files: Optional[int] = 1,
+        concurrent_chunks: Optional[int] = 2,
     ):
         """
         Args:
@@ -112,22 +131,20 @@ class FileSenderClient:
             auth: The authentication method.
                 This is optional, but you almost always want to provide it.
                 Generally you will want to use [`UserAuth`][filesender.UserAuth] or [`GuestAuth`][filesender.GuestAuth].
-            concurrent_reads: The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory
-                usage of the application. None, the default value, sets no limit.
-                See <https://wehi-researchcomputing.github.io/FileSenderCli/benchmark> for a detailed explanation of this parameter.
-            concurrent_requests: The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory
-                usage of the application. None, the default value, sets no limit.
-                See <https://wehi-researchcomputing.github.io/FileSenderCli/benchmark> for a detailed explanation of this parameter.
+            concurrent_files: The number of files that will be uploaded concurrently.
+                This works multiplicatively with `concurrent_chunks`, so `concurrent_files=2, concurrent_chunks=2` means 4 total
+                chunks of data will be stored in memory and sent concurrently.
+            concurrent_chunks: The number of chunks that will be read from each file concurrently. Increase this number to
+                speed up transfers, or reduce this number to reduce memory usage and network errors.
+                This can be set to `None` to enable unlimited concurrency, but use at your own risk.
         """
         self.base_url = base_url
         self.auth = auth
         # FileSender seems to sometimes use redirects
         self.http_client = AsyncClient(timeout=None, follow_redirects=True)
         self.chunk_size = chunk_size
-        # If we don't want a concurrency limit, we just use an infinitely large semaphore
-        # See: https://github.com/python/typeshed/issues/12147
-        self._read_sem = Semaphore(concurrent_reads or float("inf"))  # type: ignore
-        self._req_sem = Semaphore(concurrent_requests or float("inf"))  # type: ignore
+        self.concurrent_chunks = concurrent_chunks
+        self.concurrent_files = concurrent_files
 
     async def prepare(self) -> None:
         """
@@ -146,11 +163,20 @@ class FileSenderClient:
         """
         Signs a request and sends it, returning the JSON result
         """
+        with raise_status():
+            return await self._sign_send_inner(request)
+
+    @retry(
+        retry=retry_if_exception(should_retry),
+        wait=wait_fixed(0.1),
+        stop=stop_after_attempt(5),
+        before_sleep=lambda x: logger.warn(f"Attempt {x.attempt_number}.{x.outcome}")
+    )
+    async def _sign_send_inner(self, request: Request) -> Any:
+        # Needs to be a separate function to handle retry policy correctly
         self.auth.sign(request, self.http_client)
-        async with self._req_sem:
-            with raise_status():
-                res = await self.http_client.send(request)
-                res.raise_for_status()
+        res = await self.http_client.send(request)
+        res.raise_for_status()
         return res.json()
 
     async def create_transfer(
@@ -229,20 +255,25 @@ class FileSenderClient:
         Params:
             file_info: Identifier obtained from the result of [`create_transfer`][filesender.FileSenderClient.create_transfer]
             path: File path to the file to be uploaded
+
+        Returns: An async generator. You can force the uploads to occur using `list()`.
         """
         if self.chunk_size is None:
             raise Exception(".prepare() has not been called!")
 
-        tasks: List[Coroutine[None, None, None]] = []
-        # Each chunk is read synchronously since `async for` is effectively synchronous
-        async for chunk, offset in yield_chunks(path, self.chunk_size):
-            async with self._read_sem:
-                # However, the upload is not awaited, which allows them to run in parallel
-                tasks.append(
-                    self._upload_chunk(chunk=chunk, offset=offset, file_info=file_info)
-                )
-        # Pause until all running tasks are finished
-        await gather(*tasks)
+        async def _task_generator(chunk_size: int) -> AsyncIterator[Tuple[response.File, int, bytes]]:
+            async for chunk, offset in yield_chunks(path, chunk_size):
+                yield file_info, offset, chunk
+
+        async with (
+            stream.starmap(
+            _task_generator(self.chunk_size),
+            self._upload_chunk, # type: ignore
+            task_limit=self.concurrent_chunks
+        )
+       ).stream() as streamer:
+            async for _ in tqdm(streamer, total=math.ceil(file_info["size"] / self.chunk_size), desc=file_info["name"]): # type: ignore
+                pass
 
     async def _upload_chunk(
         self,
@@ -310,12 +341,17 @@ class FileSenderClient:
             token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
             out_dir: The path to write the downloaded files.
         """
+
+        file_ids = await self._files_from_token(token)
+
+        async def _download_args() -> AsyncIterator[Tuple[str, Any, Path]]:
+            "Yields tuples of arguments to pass to download_file"
+            for file_id in file_ids:
+                yield token, file_id, out_dir
+
         # Each file is downloaded in parallel
-        tasks = [
-            self.download_file(token=token, file_id=file, out_dir=out_dir)
-            for file in await self._files_from_token(token)
-        ]
-        await gather(*tasks)
+        # Pyright messes this up
+        await stream.starmap(_download_args(), self.download_file, task_limit=self.concurrent_files) # type: ignore
 
     async def download_file(
         self,
@@ -368,16 +404,14 @@ class FileSenderClient:
         Args:
             files: A list of files and/or directories to upload.
             transfer_args: Additional options to include when creating the transfer, for example a subject or message. See [`PartialTransfer`][filesender.request_types.PartialTransfer].
-
         Returns:
             : See [`Transfer`][filesender.response_types.Transfer]
         """
         files_by_name = {key: value for key, value in iter_files(files)}
+        file_info: List[request.File] = [{"name": name, "size": file.stat().st_size} for name, file in files_by_name.items()]
         transfer = await self.create_transfer(
             {
-                "files": [
-                    {"name": name, "size": file.stat().st_size} for name, file in files_by_name.items()
-                ],
+                "files": file_info,
                 "options": {
                     "email_download_complete": True,
                 },
@@ -387,16 +421,19 @@ class FileSenderClient:
         self.http_client.params = self.http_client.params.set(
             "roundtriptoken", transfer["roundtriptoken"]
         )
-        # Upload each file in parallel
-        # Note: update to TaskGroup once Python 3.10 is unsupported
-        tasks = [
-            self.upload_complete(file_info=file, path=files_by_name[file["name"]])
-            for file in transfer["files"]
-            # Skip folders, which aren't real
-            if file["name"] in files_by_name
-        ]
-        await gather(*tasks)
 
+        async def _upload_args() -> AsyncIterator[Tuple[response.File, Path]]:
+            for file in transfer["files"]:
+            # Skip folders, which aren't real
+                if file["name"] in files_by_name:
+                    # Pyright seems to not understand that some fields are optional
+                    yield file, files_by_name[file["name"]]
+
+        # Upload each file in parallel
+        # Pyright doesn't map the type signatures correctly here
+        await stream.starmap(_upload_args(), self.upload_complete, ordered=False, task_limit=self.concurrent_files) # type: ignore
+
+        # Mark the transfer as complete
         transfer = await self.update_transfer(
             transfer_id=transfer["id"], body={"complete": True}
         )

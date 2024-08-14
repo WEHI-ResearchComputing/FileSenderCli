@@ -1,10 +1,20 @@
 # Changelog
 
-## Version 1.4.0
+## Version 2.0.0
 
 ### Added
 
 * Implement directory tree uploads. You can now pass directory paths anywhere you could previously just pass file paths, including the CLI and the Python API. However, note that currently the directory hierarchy won't be preserved. So if you upload `dir_a/file_a.txt` and `dir_b/file_b.txt`, they will simply be downloaded as `file_a.txt` and `file_b.txt` with their directories stripped out. This is a limitation of the current API. See https://github.com/filesender/filesender/issues/1555 for context.
+* A progress bar to uploads
+
+### Fixed
+
+* Memory usage in 1.3.0 was incredibly high, because the entire file was being kept in memory due to a bug. This is now resolved
+
+### Changed
+
+* The `concurrent_reqs` and `concurrent_reads` client arguments, as well as their corresponding CLI arguments have been replaced by `concurrent_chunks` and `concurrent_files`. Read the docs to understand how these work 
+* Automatic retries for transient failures.
 
 ## Version 1.3.0
 

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
@@ -20,4 +20,6 @@ jobs:
         run: pip install .
       - uses: jakebailey/pyright-action@v2
         with:
-          version: 1.1.367
+          version: 1.1.376
+      - name: Test CLI help
+        run: filesender --help
