@@ -1,4 +1,4 @@
-from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Set, cast
+from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Set
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -425,6 +425,7 @@ class FileSenderClient:
             for file in transfer["files"]:
             # Skip folders, which aren't real
                 if file["name"] in files_by_name:
+                    # Pyright seems to not understand the 
                     yield file, files_by_name[file["name"]]
 
         # Upload each file in parallel
