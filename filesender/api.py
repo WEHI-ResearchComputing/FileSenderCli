@@ -8,7 +8,7 @@ from pathlib import Path
 from httpx import Request, AsyncClient, HTTPStatusError, RequestError, ReadError
 import math
 import aiofiles
-from aiostream import pipe, stream
+from aiostream import stream
 from contextlib import contextmanager
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception
 import logging
@@ -429,7 +429,8 @@ class FileSenderClient:
                     yield file, files_by_name[file["name"]]
 
         # Upload each file in parallel
-        await stream.starmap(_upload_args(), self.upload_complete, ordered=False, task_limit=self.concurrent_files)
+        # Pyright doesn't map the type signatures correctly here
+        await stream.starmap(_upload_args(), self.upload_complete, ordered=False, task_limit=self.concurrent_files) # type: ignore
 
         # Mark the transfer as complete
         transfer = await self.update_transfer(
