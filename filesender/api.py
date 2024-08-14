@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator, Callable, Iterable, List, Optional, Tuple, AsyncIterator, Set
+from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Set, cast
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -266,13 +266,13 @@ class FileSenderClient:
                 yield file_info, offset, chunk
 
         async with (
-            stream.iterate(
-                _task_generator(self.chunk_size)
-            ) | pipe.starmap(
-            self._upload_chunk,
+            stream.starmap(
+            _task_generator(self.chunk_size),
+            self._upload_chunk, # type: ignore
             task_limit=self.concurrent_chunks
-        )).stream() as streamer:
-            async for _ in tqdm(streamer, total=math.ceil(file_info["size"] / self.chunk_size), desc=file_info["name"]):
+        )
+       ).stream() as streamer:
+            async for _ in tqdm(streamer, total=math.ceil(file_info["size"] / self.chunk_size), desc=file_info["name"]): # type: ignore
                 pass
 
     async def _upload_chunk(

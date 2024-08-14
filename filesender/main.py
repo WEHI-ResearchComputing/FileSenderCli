@@ -22,12 +22,11 @@ def typer_async(f: Callable[P, Coroutine[Any, Any, T]]):
 
     return wrapper
 
-
 ChunkSize = Annotated[Optional[int], Option(help="The size of each chunk to read from the input file during the upload process. Larger values will result in a faster upload but use more memory. If the value exceeds the server's maximum chunk size, this command will fail.")]
 Verbose = Annotated[bool, Option(help="Enable more detailed outputs")]
 Delay = Annotated[int, Option(help="Delay the signature timestamp by N seconds. Increase this value if you have a slow connection. This value should be approximately the time it takes you to upload one chunk to the server.", metavar="N")]
-ConcurrentFiles = Annotated[Optional[int], Option(help="The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
-ConcurrentChunks = Annotated[Optional[int], Option(help="The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory usage of the application. None, the default value, sets no limit. See https://wehi-researchcomputing.github.io/FileSenderCli/benchmark for a detailed explanation of this parameter.")]
+ConcurrentFiles = Annotated[Optional[int], Option(help="The number of files that will be uploaded concurrently.  This works multiplicatively with `concurrent_chunks`, so `concurrent_files=2, concurrent_chunks=2` means 4 total chunks of data will be stored in memory and sent concurrently.")]
+ConcurrentChunks = Annotated[Optional[int], Option(help="The number of chunks that will be read from each file concurrently. Increase this number to speed up transfers, or reduce this number to reduce memory usage and network errors. This can be set to `None` to enable unlimited concurrency, but use at your own risk.")]
 UploadFiles = Annotated[List[Path], Argument(file_okay=True, dir_okay=True, resolve_path=True, exists=True, help="Files and/or directories to upload")]
 
 context: Dict[Any, Any] = {

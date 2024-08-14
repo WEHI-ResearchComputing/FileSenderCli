@@ -8,7 +8,7 @@ from contextlib import contextmanager, ExitStack
 from secrets import token_bytes
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Generator, Iterable, List, Tuple, Union
+from typing import Any, Dict, Generator, List, Tuple
 from dataclasses import dataclass
 import multiprocessing as mp
 
