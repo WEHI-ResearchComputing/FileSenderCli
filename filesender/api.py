@@ -1,5 +1,4 @@
-import ssl
-from typing import Any, Callable, Coroutine, Generator, Iterable, List, Optional, Tuple, AsyncIterator, Set
+from typing import Any, AsyncGenerator, Callable, Iterable, List, Optional, Tuple, AsyncIterator, Set
 from bs4 import BeautifulSoup
 import filesender.response_types as response
 import filesender.request_types as request
@@ -7,12 +6,15 @@ from urllib.parse import urlparse, urlunparse, unquote
 from filesender.auth import Auth
 from pathlib import Path
 from httpx import Request, AsyncClient, HTTPStatusError, RequestError, ReadError
-from asyncio import Semaphore, gather
+import math
 import aiofiles
 from aiostream import pipe, stream
 from contextlib import contextmanager
-from tenacity import AsyncRetrying, RetryError, retry, retry_if_exception_type, stop_after_attempt, wait_fixed, retry_if_exception
-# from httpcore import ReadError
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception
+import logging
+from tqdm.asyncio import tqdm
+
+logger = logging.getLogger(__name__)
 
 def should_retry(e: BaseException) -> bool:
     """
@@ -115,8 +117,8 @@ class FileSenderClient:
         base_url: str,
         chunk_size: Optional[int] = None,
         auth: Auth = Auth(),
-        concurrent_files: Optional[int] = None,
-        concurrent_chunks: Optional[int] = None,
+        concurrent_files: Optional[int] = 1,
+        concurrent_chunks: Optional[int] = 2,
     ):
         """
         Args:
@@ -129,12 +131,12 @@ class FileSenderClient:
             auth: The authentication method.
                 This is optional, but you almost always want to provide it.
                 Generally you will want to use [`UserAuth`][filesender.UserAuth] or [`GuestAuth`][filesender.GuestAuth].
-            concurrent_reads: The maximum number of file chunks that can be processed at a time. Reducing this number will decrease the memory
-                usage of the application. None, the default value, sets no limit.
-                See <https://wehi-researchcomputing.github.io/FileSenderCli/benchmark> for a detailed explanation of this parameter.
-            concurrent_requests: The maximum number of API requests the client can be waiting for at a time. Reducing this number will decrease the memory
-                usage of the application. None, the default value, sets no limit.
-                See <https://wehi-researchcomputing.github.io/FileSenderCli/benchmark> for a detailed explanation of this parameter.
+            concurrent_files: The number of files that will be uploaded concurrently.
+                This works multiplicatively with `concurrent_chunks`, so `concurrent_files=2, concurrent_chunks=2` means 4 total
+                chunks of data will be stored in memory and sent concurrently.
+            concurrent_chunks: The number of chunks that will be read from each file concurrently. Increase this number to
+                speed up transfers, or reduce this number to reduce memory usage and network errors.
+                This can be set to `None` to enable unlimited concurrency, but use at your own risk.
         """
         self.base_url = base_url
         self.auth = auth
@@ -143,8 +145,6 @@ class FileSenderClient:
         self.chunk_size = chunk_size
         self.concurrent_chunks = concurrent_chunks
         self.concurrent_files = concurrent_files
-
-
 
     async def prepare(self) -> None:
         """
@@ -159,21 +159,24 @@ class FileSenderClient:
                 f"--chunk-size can't be greater than the server's maximum supported chunk size. For this server, the maximum is {info['upload_chunk_size']}"
             )
 
-    # @retry(retry=retry_if_exception_type(ReadError), wait=wait_fixed(0.1))
     async def _sign_send(self, request: Request) -> Any:
         """
         Signs a request and sends it, returning the JSON result
         """
-        async with self._req_sem:
-            try:
-                with raise_status():
-                    async for attempt in AsyncRetrying(retry=retry_if_exception(should_retry), wait=wait_fixed(0.1), stop=stop_after_attempt(5)):
-                        with attempt:
-                            self.auth.sign(request, self.http_client)
-                            res = await self.http_client.send(request)
-                            res.raise_for_status()
-            except RetryError:
-                pass
+        with raise_status():
+            return await self._sign_send_inner(request)
+
+    @retry(
+        retry=retry_if_exception(should_retry),
+        wait=wait_fixed(0.1),
+        stop=stop_after_attempt(5),
+        before_sleep=lambda x: logger.warn(f"Attempt {x.attempt_number}.{x.outcome}")
+    )
+    async def _sign_send_inner(self, request: Request) -> Any:
+        # Needs to be a separate function to handle retry policy correctly
+        self.auth.sign(request, self.http_client)
+        res = await self.http_client.send(request)
+        res.raise_for_status()
         return res.json()
 
     async def create_transfer(
@@ -244,7 +247,7 @@ class FileSenderClient:
             )
         )
 
-    async def upload_file(self, file_info: response.File, path: Path, progress_hook: ProgressHook = None) -> AsyncIterator[None]:
+    async def upload_file(self, file_info: response.File, path: Path) -> None:
         """
         Uploads a file, with multiple chunks being uploaded in parallel
         Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
@@ -252,7 +255,6 @@ class FileSenderClient:
         Params:
             file_info: Identifier obtained from the result of [`create_transfer`][filesender.FileSenderClient.create_transfer]
             path: File path to the file to be uploaded
-            progress_hook: An optional function with the signature (bytes_sent: int, total_bytes: int) that will be called after each chunk
 
         Returns: An async generator. You can force the uploads to occur using `list()`.
         """
@@ -263,19 +265,15 @@ class FileSenderClient:
             async for chunk, offset in yield_chunks(path, chunk_size):
                 yield file_info, offset, chunk
 
-        # progress = 0
         async with (
             stream.iterate(
                 _task_generator(self.chunk_size)
             ) | pipe.starmap(
             self._upload_chunk,
-            task_limit=2
+            task_limit=self.concurrent_chunks
         )).stream() as streamer:
-            async for _ in streamer:
+            async for _ in tqdm(streamer, total=math.ceil(file_info["size"] / self.chunk_size), desc=file_info["name"]):
                 pass
-                # if progress_hook is not None:
-                #     progress += self.chunk_size
-                #     progress_hook(progress, file_info["size"])
 
     async def _upload_chunk(
         self,
@@ -343,12 +341,16 @@ class FileSenderClient:
             token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
             out_dir: The path to write the downloaded files.
         """
+
+        file_ids = await self._files_from_token(token)
+
+        async def _download_args() -> AsyncIterator[tuple[str, Any, Path]]:
+            "Yields tuples of arguments to pass to download_file"
+            for file_id in file_ids:
+                yield token, file_id, out_dir
+
         # Each file is downloaded in parallel
-        tasks = [
-            self.download_file(token=token, file_id=file, out_dir=out_dir)
-            for file in await self._files_from_token(token)
-        ]
-        await gather(*tasks)
+        await (stream.iterate(_download_args()) | pipe.starmap(self.download_file, task_limit=self.concurrent_files))
 
     async def download_file(
         self,
@@ -393,7 +395,7 @@ class FileSenderClient:
         return (await self.http_client.get(f"{self.base_url}/info")).json()
 
     async def upload_workflow(
-        self, files: List[Path], transfer_args: request.PartialTransfer = {}, progress_hook: ProgressHook = None
+        self, files: List[Path], transfer_args: request.PartialTransfer = {}
     ) -> response.Transfer:
         """
         High level function for uploading one or more files
@@ -401,8 +403,6 @@ class FileSenderClient:
         Args:
             files: A list of files and/or directories to upload.
             transfer_args: Additional options to include when creating the transfer, for example a subject or message. See [`PartialTransfer`][filesender.request_types.PartialTransfer].
-            progress_hook: An optional function that takes (current_bytes, total_bytes), which is called periodically, for example to update a progress bar.
-
         Returns:
             : See [`Transfer`][filesender.response_types.Transfer]
         """
@@ -417,26 +417,18 @@ class FileSenderClient:
                 **transfer_args,
             }
         )
-        current_bytes: int = 0
-        total_bytes = sum(file["size"] for file in file_info)
         self.http_client.params = self.http_client.params.set(
             "roundtriptoken", transfer["roundtriptoken"]
         )
-        # Adapter hook that applies to the entire transfer, not just one file
-        def _progress_hook(bytes: int, total: int):
-            nonlocal current_bytes
-            if progress_hook is not None:
-                current_bytes += self.chunk_size
-                progress_hook(current_bytes, total_bytes)
 
-        async def _upload_args() -> AsyncIterator[tuple[request.File, Path, ProgressHook]]:
+        async def _upload_args() -> AsyncIterator[tuple[request.File, Path]]:
             for file in transfer["files"]:
             # Skip folders, which aren't real
                 if file["name"] in files_by_name:
-                    yield file, files_by_name[file["name"]], _progress_hook
+                    yield file, files_by_name[file["name"]]
 
         # Upload each file in parallel
-        await aiostream.stream.starmap(_upload_args(), self.upload_complete, ordered=False, task_limit=self.concurrent_files)
+        await stream.starmap(_upload_args(), self.upload_complete, ordered=False, task_limit=self.concurrent_files)
 
         # Mark the transfer as complete
         transfer = await self.update_transfer(
@@ -444,10 +436,10 @@ class FileSenderClient:
         )
         return transfer
 
-    async def upload_complete(self, file_info: response.File, path: Path, progress_hook: ProgressHook = None) -> None:
+    async def upload_complete(self, file_info: response.File, path: Path) -> None:
         """
         Uploads a file and marks the upload as complete.
         Generally you should use [`upload_workflow`][filesender.FileSenderClient.upload_workflow] instead of this, which is much more user friendly.
         """
-        await self.upload_file(file_info=file_info, path=path, progress_hook=progress_hook)
+        await self.upload_file(file_info=file_info, path=path)
         await self.update_file(file_info=file_info, body={"complete": True})

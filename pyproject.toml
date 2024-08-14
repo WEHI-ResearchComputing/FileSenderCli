@@ -25,7 +25,8 @@ dependencies = [
     "httpcore >= 1.0.3",
     "cryptography",
     "typing_extensions",
-    "tenacity"
+    "tenacity",
+    "tqdm"
 ]
 
 [tool.setuptools.packages.find]
@@ -44,7 +45,10 @@ dev = [
     "pygments",
     "black",
     "seaborn",
-    "pandas"
+    "pandas",
+    "jupyter",
+    "notebook<7",
+    "nbconvert"
 ]
 
 [project.scripts]
