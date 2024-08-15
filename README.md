@@ -1,5 +1,7 @@
 # FileSender CLI
 
+![PyPI - Version](https://img.shields.io/pypi/v/filesender-client)
+
 ## Installation
 
 Requires `Python>=3.8`
