@@ -1,5 +1,5 @@
 from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Set
-from bs4 import BeautifulSoup
+from filesender.download import files_from_page, DownloadFile
 import filesender.response_types as response
 import filesender.request_types as request
 from urllib.parse import urlparse, urlunparse, unquote
@@ -10,7 +10,7 @@ import math
 import aiofiles
 from aiostream import stream
 from contextlib import contextmanager
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception
+from tenacity import RetryCallState, retry, stop_after_attempt, wait_fixed, retry_if_exception
 import logging
 from tqdm.asyncio import tqdm
 
@@ -25,9 +25,13 @@ def should_retry(e: BaseException) -> bool:
         # Seems to be just a bug in the backend
         # https://github.com/encode/httpx/discussions/2941 
         return True
-    elif isinstance(e, HTTPStatusError) and e.response.status_code == 500 and e.response.json()["message"] == "auth_remote_too_late":
+    elif isinstance(e, HTTPStatusError) and e.response.status_code == 500:
+        message = e.response.json()["message"]
+        if message == "auth_remote_too_late":
+            return True
+        if message == "auth_remote_signature_check_failed":
+            return True
         # These errors are caused by lag between creating the response and it being received
-        return True
     return False
 
 
@@ -40,6 +44,13 @@ def url_without_scheme(url: str) -> str:
     """
     return unquote(urlunparse(urlparse(url)._replace(scheme="")).lstrip("/"))
 
+def exception_to_message(e: BaseException) -> str:
+    if isinstance(e, HTTPStatusError):
+        return f"Request failed with content {e.response.text} for request {e.request.method} {e.request.url}."
+    elif isinstance(e, RequestError):
+        return f"Request failed for request {e.request.method} {e.request.url}. {repr(e)}"
+    else:
+        return repr(e)
 
 @contextmanager
 def raise_status():
@@ -49,16 +60,8 @@ def raise_status():
     """
     try:
         yield
-    except HTTPStatusError as e:
-        raise Exception(
-            f"Request failed with content {e.response.text} for request {e.request.method} {e.request.url}"
-        ) from e
-    except RequestError as e:
-        # TODO: check for SSL read error
-        raise Exception(
-            f"Request failed for request {e.request.method} {e.request.url}"
-        ) from e
-
+    except BaseException as e:
+        raise Exception(exception_to_message(e)) from e
 
 async def yield_chunks(path: Path, chunk_size: int) -> AsyncIterator[Tuple[bytes, int]]:
     """
@@ -166,11 +169,20 @@ class FileSenderClient:
         with raise_status():
             return await self._sign_send_inner(request)
 
+    @staticmethod
+    def on_retry(state: RetryCallState) -> None:
+        message = str(state.outcome)
+        if state.outcome is not None and state.outcome.failed:
+            e = state.outcome.exception()
+            message = exception_to_message(e)
+
+        logger.warn(f"Attempt {state.attempt_number}. {message}")
+
     @retry(
         retry=retry_if_exception(should_retry),
         wait=wait_fixed(0.1),
         stop=stop_after_attempt(5),
-        before_sleep=lambda x: logger.warn(f"Attempt {x.attempt_number}.{x.outcome}")
+        before_sleep=on_retry
     )
     async def _sign_send_inner(self, request: Request) -> Any:
         # Needs to be a separate function to handle retry policy correctly
@@ -313,19 +325,14 @@ class FileSenderClient:
             self.http_client.build_request("POST", f"{self.base_url}/guest", json=body)
         )
 
-    async def _files_from_token(self, token: str) -> Set[int]:
+    async def _files_from_token(self, token: str) -> Iterable[DownloadFile]:
         """
         Internal function that returns a list of file IDs for a given guest token
         """
         download_page = await self.http_client.get(
             "https://filesender.aarnet.edu.au", params={"s": "download", "token": token}
         )
-        files: Set[int] = set()
-        for file in BeautifulSoup(download_page.content, "html.parser").find_all(
-            class_="file"
-        ):
-            files.add(int(file.attrs["data-id"]))
-        return files
+        return files_from_page(download_page.content)
 
     async def download_files(
         self,
@@ -342,12 +349,12 @@ class FileSenderClient:
             out_dir: The path to write the downloaded files.
         """
 
-        file_ids = await self._files_from_token(token)
+        file_meta = await self._files_from_token(token)
 
-        async def _download_args() -> AsyncIterator[Tuple[str, Any, Path]]:
+        async def _download_args() -> AsyncIterator[Tuple[str, Any, Path, int, str]]:
             "Yields tuples of arguments to pass to download_file"
-            for file_id in file_ids:
-                yield token, file_id, out_dir
+            for file in file_meta:
+                yield token, file["id"], out_dir, file["size"], file["name"]
 
         # Each file is downloaded in parallel
         # Pyright messes this up
@@ -358,8 +365,8 @@ class FileSenderClient:
         token: str,
         file_id: int,
         out_dir: Path,
-        key: Optional[bytes] = None,
-        algorithm: Optional[str] = None,
+        file_size: int | float = float("inf"),
+        file_name: Optional[str] = None
     ) -> None:
         """
         Downloads a single file.
@@ -368,6 +375,8 @@ class FileSenderClient:
             token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
             file_id: A single file ID indicating the file to be downloaded.
             out_dir: The path to write the downloaded file.
+            file_size: The file size in bytes, optionally
+            file_name: The file name of the file being downloaded. This will impact the name by which it's saved.
         """
         download_endpoint = urlunparse(
             urlparse(self.base_url)._replace(path="/download.php")
@@ -375,16 +384,24 @@ class FileSenderClient:
         async with self.http_client.stream(
             "GET", download_endpoint, params={"files_ids": file_id, "token": token}
         ) as res:
-            for content_param in res.headers["Content-Disposition"].split(";"):
-                if "filename" in content_param:
-                    filename = content_param.split("=")[1].lstrip('"').rstrip('"')
-                    break
-            else:
-                raise Exception("No filename found")
+            # Determine filename from response, if not provided
+            if file_name is None:
+                for content_param in res.headers["Content-Disposition"].split(";"):
+                    if "filename" in content_param:
+                        file_name = content_param.split("=")[1].lstrip('"').rstrip('"')
+                        break
+                else:
+                    raise Exception("No filename found")
 
-            async with aiofiles.open(out_dir / filename, "wb") as fp:
-                async for chunk in res.aiter_raw(chunk_size=8192):
-                    await fp.write(chunk)
+            chunk_size = 8192
+            chunk_size_mb = chunk_size / 1024 / 1024
+            with tqdm(desc=file_name, unit="MB", total=int(file_size / 1024 / 1024)) as progress:
+                async with aiofiles.open(out_dir / file_name, "wb") as fp:
+                    # We can't add the total here, because we don't know it: 
+                    # https://github.com/filesender/filesender/issues/1555
+                    async for chunk in res.aiter_raw(chunk_size=chunk_size):
+                        await fp.write(chunk)
+                        progress.update(chunk_size_mb)
 
     async def get_server_info(self) -> response.ServerInfo:
         """
