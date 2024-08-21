@@ -1,3 +1,4 @@
+from typing import Union
 from click import ParamType, Context, Parameter
 from enum import Enum
 
@@ -13,7 +14,7 @@ class LogLevel(Enum):
 class LogParam(ParamType):
     name = "LogParam"
 
-    def convert(self, value: int | str, param: Parameter | None, ctx: Context | None) -> int:
+    def convert(self, value: Union[int, str], param: Union[Parameter, None], ctx: Union[Context, None]) -> int:
         if isinstance(value, int):
             return value
 
