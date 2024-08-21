@@ -24,6 +24,6 @@ class LogParam(ParamType):
 
         return LogLevel[value].value
 
-    def get_metavar(self, param: Parameter) -> str | None:
+    def get_metavar(self, param: Parameter) -> Union[str, None]:
         # Print out the choices
         return "|".join(LogLevel._member_map_)
