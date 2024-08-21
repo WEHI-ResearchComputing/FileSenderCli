@@ -47,20 +47,20 @@ def version_callback(value: bool):
 
 @app.callback(context_settings=context)
 def common_args(
-    base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
     context: Context,
+    base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
+    log_level: Annotated[
+        int, Option(click_type=LogParam(), help="Logging verbosity", )
+    ] = LogLevel.INFO.value,
     version: Annotated[
         Optional[bool], Option("--version", callback=version_callback)
-    ] = None,
-    log_level: Annotated[
-        LogLevel, Option("--log-level", click_type=LogParam(), help="Logging verbosity")
-    ] = LogLevel.WARNING
+    ] = None
 ):
     context.obj = {
         "base_url": base_url
     }
     logging.basicConfig(
-        level=log_level.value, format= "%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+        level=log_level, format= "%(message)s", datefmt="[%X]", handlers=[RichHandler()]
     )
 
 
@@ -110,7 +110,7 @@ def invite(
             }
         }
     }))
-    logger.info(result)
+    logger.log(LogLevel.VERBOSE.value, result)
     logger.info("Invitation successfully sent")
 
 @app.command(context_settings=context)
@@ -120,8 +120,8 @@ async def upload_voucher(
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
     context: Context,
-    concurrent_files: ConcurrentFiles = None,
-    concurrent_chunks: ConcurrentChunks = None,
+    concurrent_files: ConcurrentFiles = 1,
+    concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
 ):
     """
@@ -138,8 +138,8 @@ async def upload_voucher(
     await auth.prepare(client.http_client)
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"from": email, "recipients": []})
-    logger.info(result)
-    logger.info("Upload completed successfully")
+    logger.log(LogLevel.VERBOSE.value, result)
+    logger.log(LogLevel.INFO.value, "Upload completed successfully")
 
 @app.command(context_settings=context)
 @typer_async
@@ -149,8 +149,8 @@ async def upload(
     files: UploadFiles,
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
-    concurrent_files: ConcurrentFiles = None,
-    concurrent_chunks: ConcurrentChunks = None,
+    concurrent_files: ConcurrentFiles = 1,
+    concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
     delay: Delay = 0
 ):
@@ -170,8 +170,8 @@ async def upload(
     )
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"recipients": recipients, "from": username})
-    logger.info(result)
-    logger.info("Upload completed successfully")
+    logger.log(LogLevel.VERBOSE.value, result)
+    logger.log(LogLevel.INFO.value, "Upload completed successfully")
 
 @app.command(context_settings=context)
 def download(
@@ -188,7 +188,7 @@ def download(
         token=token,
         out_dir=out_dir
     ))
-    print(f"Download completed successfully. Files can be found in {out_dir}")
+    logger.log(LogLevel.INFO.value, f"Download completed successfully. Files can be found in {out_dir}")
 
 @app.command(context_settings=context)
 @typer_async
@@ -198,7 +198,7 @@ async def server_info(
     """Prints out information about the FileSender server you are interfacing with"""
     client = FileSenderClient(base_url=context.obj["base_url"])
     result = await client.get_server_info()
-    print(result)
+    logger.log(LogLevel.INFO.value, result)
 
 if __name__ == "__main__":
     app()
