@@ -1,4 +1,4 @@
-from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Set
+from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator
 from filesender.download import files_from_page, DownloadFile
 import filesender.response_types as response
 import filesender.request_types as request
@@ -172,9 +172,10 @@ class FileSenderClient:
     @staticmethod
     def on_retry(state: RetryCallState) -> None:
         message = str(state.outcome)
-        if state.outcome is not None and state.outcome.failed:
+        if state.outcome is not None:
             e = state.outcome.exception()
-            message = exception_to_message(e)
+            if e is not None:
+                message = exception_to_message(e)
 
         logger.warn(f"Attempt {state.attempt_number}. {message}")
 
