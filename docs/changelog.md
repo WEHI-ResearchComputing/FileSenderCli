@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 2.1.0
+
+### Added
+
+* A progress bar for file downloads
+
+### Changed
+
+* All terminal output is now through the `logging` module. You can use the new `--log-level` CLI parameter to configure the amount of info that is printed out.
+* Update the CLI default concurrency to 2 for chunks and 1 for files. This seems to be moderately performant without ever failing
+
 ## Version 2.0.0
 
 ### Added
