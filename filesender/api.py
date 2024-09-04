@@ -366,7 +366,7 @@ class FileSenderClient:
         token: str,
         file_id: int,
         out_dir: Path,
-        file_size: Union[int, float] = float("inf"),
+        file_size: Union[int, float, None] = None,
         file_name: Optional[str] = None
     ) -> None:
         """
@@ -376,7 +376,7 @@ class FileSenderClient:
             token: Obtained from the transfer email. The same as [`GuestAuth`][filesender.GuestAuth]'s `guest_token`.
             file_id: A single file ID indicating the file to be downloaded.
             out_dir: The path to write the downloaded file.
-            file_size: The file size in bytes, optionally
+            file_size: The file size in bytes, optionally.
             file_name: The file name of the file being downloaded. This will impact the name by which it's saved.
         """
         download_endpoint = urlunparse(
@@ -394,9 +394,11 @@ class FileSenderClient:
                 else:
                     raise Exception("No filename found")
 
+            file_path = out_dir / file_name
+            file_path.parent.mkdir(parents=True, exist_ok=True)
             chunk_size = 8192
             chunk_size_mb = chunk_size / 1024 / 1024
-            with tqdm(desc=file_name, unit="MB", total=int(file_size / 1024 / 1024)) as progress:
+            with tqdm(desc=file_name, unit="MB", total=None if file_size is None else int(file_size / 1024 / 1024)) as progress:
                 async with aiofiles.open(out_dir / file_name, "wb") as fp:
                     # We can't add the total here, because we don't know it: 
                     # https://github.com/filesender/filesender/issues/1555

@@ -6,6 +6,11 @@ import pytest
 from filesender.request_types import GuestOptions
 from filesender.benchmark import make_tempfile, make_tempfiles, benchmark
 
+def count_files_recursively(path: Path) -> int:
+    """
+    Returns a recursive count of the number of files within a directory. Subdirectories are not counted.
+    """
+    return sum([1 if child.is_file() else 0 for child in path.rglob("*")])
 
 @pytest.mark.asyncio
 async def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
@@ -34,7 +39,7 @@ async def test_round_trip(base_url: str, username: str, apikey: str, recipient: 
             file_id=transfer["files"][0]["id"],
             out_dir=Path(download_dir),
         )
-        assert len(list(Path(download_dir).iterdir())) == 1
+        assert count_files_recursively(Path(download_dir)) == 1
 
     
 @pytest.mark.asyncio
@@ -62,7 +67,7 @@ async def test_round_trip_dir(base_url: str, username: str, apikey: str, recipie
             token=transfer["recipients"][0]["token"],
             out_dir=Path(download_dir),
         )
-        assert len(list(Path(download_dir).iterdir())) == 2
+        assert count_files_recursively(Path(download_dir)) == 2
 
 
 @pytest.mark.asyncio
@@ -113,7 +118,7 @@ async def test_voucher_round_trip(
             file_id=transfer["files"][0]["id"],
             out_dir=Path(download_dir),
         )
-        assert len(list(Path(download_dir).iterdir())) == 1
+        assert count_files_recursively(Path(download_dir)) == 1
 
 
 @pytest.mark.asyncio
