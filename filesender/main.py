@@ -60,8 +60,12 @@ def common_args(
         "base_url": base_url
     }
     logging.basicConfig(
-        level=log_level, format= "%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+        level=log_level,
+        format= "%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler()]
     )
+    logging.addLevelName(LogLevel.VERBOSE.value, 'VERBOSE')
 
 
 @app.command(context_settings=context)
