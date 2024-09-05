@@ -1,15 +1,32 @@
 from typing import Union
 from click import ParamType, Context, Parameter
 from enum import Enum
+import logging
 
 class LogLevel(Enum):
     NOTSET = 0
     DEBUG = 10
+    #: Used for verbose logging that the average user wouldn't want
     VERBOSE = 15
     INFO = 20
+    #: Used for basic feedback that a CLI user would expect
+    FEEDBACK = 25
     WARNING = 30
     ERROR = 40
     CRITICAL = 50
+
+    def configure_label(self):
+        """
+        Configures the logging module to understand this log level
+        """
+        logging.addLevelName(self.value, self.name)
+
+def configure_extra_levels():
+    """
+    Configures the logging module to understand the additional log levels
+    """
+    for level in (LogLevel.VERBOSE, LogLevel.FEEDBACK):
+        level.configure_label()
 
 class LogParam(ParamType):
     name = "LogParam"
