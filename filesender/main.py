@@ -5,6 +5,7 @@ from typing_extensions import Annotated, ParamSpec, TypeVar
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context, Exit
 from rich import print
+from rich.pretty import pretty_repr
 from pathlib import Path
 from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
@@ -12,7 +13,7 @@ from functools import wraps
 from asyncio import run
 from importlib.metadata import version
 from rich.logging import RichHandler
-from filesender.log import LogParam, LogLevel
+from filesender.log import LogParam, LogLevel, configure_extra_levels
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ def common_args(
     base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
     log_level: Annotated[
         int, Option(click_type=LogParam(), help="Logging verbosity", )
-    ] = LogLevel.INFO.value,
+    ] = LogLevel.FEEDBACK.value,
     version: Annotated[
         Optional[bool], Option("--version", callback=version_callback)
     ] = None
@@ -59,13 +60,13 @@ def common_args(
     context.obj = {
         "base_url": base_url
     }
+    configure_extra_levels()
     logging.basicConfig(
         level=log_level,
         format= "%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler()]
     )
-    logging.addLevelName(LogLevel.VERBOSE.value, 'VERBOSE')
 
 
 @app.command(context_settings=context)
@@ -114,8 +115,8 @@ def invite(
             }
         }
     }))
-    logger.log(LogLevel.VERBOSE.value, result)
-    logger.info("Invitation successfully sent")
+    logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
+    logger.log(LogLevel.FEEDBACK.value, "Invitation successfully sent")
 
 @app.command(context_settings=context)
 @typer_async
@@ -142,8 +143,8 @@ async def upload_voucher(
     await auth.prepare(client.http_client)
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"from": email, "recipients": []})
-    logger.log(LogLevel.VERBOSE.value, result)
-    logger.log(LogLevel.INFO.value, "Upload completed successfully")
+    logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
+    logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 
 @app.command(context_settings=context)
 @typer_async
@@ -174,8 +175,8 @@ async def upload(
     )
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"recipients": recipients, "from": username})
-    logger.log(LogLevel.VERBOSE.value, result)
-    logger.log(LogLevel.INFO.value, "Upload completed successfully")
+    logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
+    logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 
 @app.command(context_settings=context)
 def download(
@@ -192,7 +193,7 @@ def download(
         token=token,
         out_dir=out_dir
     ))
-    logger.log(LogLevel.INFO.value, f"Download completed successfully. Files can be found in {out_dir}")
+    logger.log(LogLevel.FEEDBACK.value, f"Download completed successfully. Files can be found in {out_dir}")
 
 @app.command(context_settings=context)
 @typer_async
@@ -202,7 +203,7 @@ async def server_info(
     """Prints out information about the FileSender server you are interfacing with"""
     client = FileSenderClient(base_url=context.obj["base_url"])
     result = await client.get_server_info()
-    logger.log(LogLevel.INFO.value, result)
+    logger.log(LogLevel.FEEDBACK.value, pretty_repr(result))
 
 if __name__ == "__main__":
     app()
