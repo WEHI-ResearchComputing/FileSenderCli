@@ -48,7 +48,8 @@ dev = [
     "pandas",
     "jupyter",
     "notebook<7",
-    "nbconvert"
+    "nbconvert",
+    "jupyter_contrib_nbextensions"
 ]
 
 [project.scripts]
