@@ -8,6 +8,8 @@
 
 ### Changed
 
+* Files are now downloaded into the appropriate subdirectory. For example if you upload `parent/child.txt`, and then later download that file, the `parent` subdirectory will be created.
+* `FileSenderClient.download_file` now has some additional args: `file_size` and `file_name` which will enable better functionality if provided. They are typically obtained from `FileSenderClient._files_from_token`
 * All terminal output is now through the `logging` module. You can use the new `--log-level` CLI parameter to configure the amount of info that is printed out.
 * Update the CLI default concurrency to 2 for chunks and 1 for files. This seems to be moderately performant without ever failing
 
