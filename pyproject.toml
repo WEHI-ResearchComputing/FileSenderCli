@@ -8,7 +8,6 @@ description = "FileSender Python CLI and API client"
 version = "2.0.0"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["one", "two"]
 license = {text = "BSD-3-Clause"}
 classifiers = [
     "Programming Language :: Python :: 3",
