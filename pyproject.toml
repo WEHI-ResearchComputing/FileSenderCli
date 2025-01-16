@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "filesender-client"
 description = "FileSender Python CLI and API client"
-version = "2.0.0"
+version = "2.1.0"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "BSD-3-Clause"}
@@ -47,7 +47,8 @@ dev = [
     "pandas",
     "jupyter",
     "notebook<7",
-    "nbconvert"
+    "nbconvert",
+    "jupyter_contrib_nbextensions"
 ]
 
 [project.scripts]

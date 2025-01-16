@@ -1,15 +1,21 @@
 from __future__ import annotations
+import logging
 from typing import Any, List, Optional, Callable, Coroutine, Dict
 from typing_extensions import Annotated, ParamSpec, TypeVar
 from filesender.api import FileSenderClient
 from typer import Typer, Option, Argument, Context, Exit
 from rich import print
+from rich.pretty import pretty_repr
 from pathlib import Path
 from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
 from functools import wraps
 from asyncio import run
 from importlib.metadata import version
+from rich.logging import RichHandler
+from filesender.log import LogParam, LogLevel, configure_extra_levels
+
+logger = logging.getLogger(__name__)
 
 from filesender.response_types import Guest, Transfer
 
@@ -42,8 +48,11 @@ def version_callback(value: bool):
 
 @app.callback(context_settings=context)
 def common_args(
-    base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
     context: Context,
+    base_url: Annotated[str, Option(help="The URL of the FileSender REST API")],
+    log_level: Annotated[
+        int, Option(click_type=LogParam(), help="Logging verbosity", )
+    ] = LogLevel.FEEDBACK.value,
     version: Annotated[
         Optional[bool], Option("--version", callback=version_callback)
     ] = None
@@ -51,6 +60,14 @@ def common_args(
     context.obj = {
         "base_url": base_url
     }
+    configure_extra_levels()
+    logging.basicConfig(
+        level=log_level,
+        format= "%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler()]
+    )
+
 
 @app.command(context_settings=context)
 def invite(
@@ -58,7 +75,6 @@ def invite(
     apikey: Annotated[str, Option(help="Your API token. This is the token of the person doing the inviting, not the person being invited.")],
     recipient: Annotated[str, Argument(help="The email address of the person to invite")],
     context: Context,
-    verbose: Verbose = False,
     # Although these parameters are exact duplicates of those in GuestOptions,
     # typer doesn't support re-using argument lists: https://github.com/tiangolo/typer/discussions/665
     one_time: Annotated[bool, Option(help="If true, this voucher is only valid for one use, otherwise it can be re-used.")] = True,
@@ -99,9 +115,8 @@ def invite(
             }
         }
     }))
-    if verbose:
-        print(result)
-    print("Invitation successfully sent")
+    logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
+    logger.log(LogLevel.FEEDBACK.value, "Invitation successfully sent")
 
 @app.command(context_settings=context)
 @typer_async
@@ -110,10 +125,9 @@ async def upload_voucher(
     guest_token: Annotated[str, Option(help="The guest token. This is the part of the upload URL after 'vid='")],
     email: Annotated[str, Option(help="The email address that was invited to upload files")],
     context: Context,
-    concurrent_files: ConcurrentFiles = None,
-    concurrent_chunks: ConcurrentChunks = None,
+    concurrent_files: ConcurrentFiles = 1,
+    concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
-    verbose: Verbose = False
 ):
     """
     Uploads files to a voucher that you have been invited to
@@ -129,9 +143,8 @@ async def upload_voucher(
     await auth.prepare(client.http_client)
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"from": email, "recipients": []})
-    if verbose:
-        print(result)
-    print("Upload completed successfully")
+    logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
+    logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 
 @app.command(context_settings=context)
 @typer_async
@@ -141,9 +154,8 @@ async def upload(
     files: UploadFiles,
     recipients: Annotated[List[str], Option(show_default=False, help="One or more email addresses to send the files")],
     context: Context,
-    verbose: Verbose = False,
-    concurrent_files: ConcurrentFiles = None,
-    concurrent_chunks: ConcurrentChunks = None,
+    concurrent_files: ConcurrentFiles = 1,
+    concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
     delay: Delay = 0
 ):
@@ -163,9 +175,8 @@ async def upload(
     )
     await client.prepare()
     result: Transfer = await client.upload_workflow(files, {"recipients": recipients, "from": username})
-    if verbose:
-        print(result)
-    print("Upload completed successfully")
+    logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
+    logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 
 @app.command(context_settings=context)
 def download(
@@ -182,7 +193,7 @@ def download(
         token=token,
         out_dir=out_dir
     ))
-    print(f"Download completed successfully. Files can be found in {out_dir}")
+    logger.log(LogLevel.FEEDBACK.value, f"Download completed successfully. Files can be found in {out_dir}")
 
 @app.command(context_settings=context)
 @typer_async
@@ -192,7 +203,7 @@ async def server_info(
     """Prints out information about the FileSender server you are interfacing with"""
     client = FileSenderClient(base_url=context.obj["base_url"])
     result = await client.get_server_info()
-    print(result)
+    logger.log(LogLevel.FEEDBACK.value, pretty_repr(result))
 
 if __name__ == "__main__":
     app()
