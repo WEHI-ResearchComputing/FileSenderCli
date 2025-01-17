@@ -156,6 +156,9 @@ async def test_upload_semaphore(
 
 @pytest.mark.asyncio
 async def test_client_download_url():
+    """
+    Tests that the client constructs the correct download URL when downloading a file
+    """
     mock_http_client = MagicMock()
     token = "NOT A REAL TOKEN"
     client = FileSenderClient(base_url="http://localhost:8080")
