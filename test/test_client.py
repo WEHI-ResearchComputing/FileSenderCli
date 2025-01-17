@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from filesender.request_types import GuestOptions
 from filesender.benchmark import make_tempfile, make_tempfiles, benchmark
+from unittest.mock import MagicMock, patch
 
 def count_files_recursively(path: Path) -> int:
     """
@@ -152,3 +153,18 @@ async def test_upload_semaphore(
         limited, unlimited = benchmark(paths, [1, float("inf")], [1, float("inf")], base_url, username, apikey, recipient)
     assert unlimited.time < limited.time
     assert unlimited.memory > limited.memory
+
+@pytest.mark.asyncio
+async def test_client_download_url():
+    """
+    Tests that the client constructs the correct download URL when downloading a file
+    """
+    mock_http_client = MagicMock()
+    token = "NOT A REAL TOKEN"
+    client = FileSenderClient(base_url="http://localhost:8080")
+    client.http_client = mock_http_client
+    try:
+        await client.download_files(token, out_dir=Path("NOT A REAL DIR"))
+    except Exception:
+        pass
+    mock_http_client.get.assert_called_once_with("http://localhost:8080", params=dict(s="download", token=token))
