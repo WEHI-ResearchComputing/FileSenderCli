@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Union
 from filesender.download import files_from_page, DownloadFile
 import filesender.response_types as response
@@ -99,13 +100,41 @@ def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[T
                 # If this is a nested file, use the relative path from the root directory as the name
                 yield str(path.relative_to(root)), path
 
+@dataclass
+class EndpointHandler:
+    base: str
+
+    def api(self) -> str:
+        return f"{self.base}/rest.php"
+
+    def download(self) -> str:
+        return f"{self.base}/download.php"
+
+    def create_transfer(self) -> str:
+        return f"{self.api()}/transfer"
+
+    def single_transfer(self, transfer_id: int) -> str:
+        return f"{self.api()}/transfer/{transfer_id}"
+
+    def chunk(self, file_id: int, offset: int) -> str:
+        return f"{self.api()}/file/{file_id}/chunk/{offset}"
+
+    def file(self, file_id: int) -> str:
+        return f"{self.api()}/file/{file_id}"
+
+    def guest(self) -> str:
+        return f"{self.api()}/guest"
+
+    def server_info(self) -> str:
+        return f"{self.api()}/info"
+
 class FileSenderClient:
     """
     A client that can be used to programmatically interact with FileSender.
     """
 
     #: The base url of the file sender's API. For example https://filesender.aarnet.edu.au/rest.php
-    base_url: str
+    urls: EndpointHandler
     #: Size of upload chunks
     chunk_size: Optional[int]
     #: Authentication provider that will be used for all privileged requests
@@ -141,13 +170,15 @@ class FileSenderClient:
                 speed up transfers, or reduce this number to reduce memory usage and network errors.
                 This can be set to `None` to enable unlimited concurrency, but use at your own risk.
         """
-        self.base_url = base_url
+        # self.base_url = base_url
+        self.urls = EndpointHandler(base_url)
         self.auth = auth
         # FileSender seems to sometimes use redirects
         self.http_client = AsyncClient(timeout=None, follow_redirects=True)
         self.chunk_size = chunk_size
         self.concurrent_chunks = concurrent_chunks
         self.concurrent_files = concurrent_files
+
 
     async def prepare(self) -> None:
         """
@@ -177,7 +208,7 @@ class FileSenderClient:
             if e is not None:
                 message = exception_to_message(e)
 
-        logger.warn(f"Attempt {state.attempt_number}. {message}")
+        logger.warning(f"Attempt {state.attempt_number}. {message}")
 
     @retry(
         retry=retry_if_exception(should_retry),
@@ -209,7 +240,7 @@ class FileSenderClient:
         return await self._sign_send(
             self.http_client.build_request(
                 "POST",
-                f"{self.base_url}/transfer",
+                self.urls.create_transfer(),
                 json=body,
             )
         )
@@ -228,12 +259,12 @@ class FileSenderClient:
             body: See [`TransferUpdate`][filesender.request_types.TransferUpdate]
 
         Returns:
-            : See [`Transfer`][filesender.response_types.Transfer]
+            See [`Transfer`][filesender.response_types.Transfer]
         """
         return await self._sign_send(
             self.http_client.build_request(
                 "PUT",
-                f"{self.base_url}/transfer/{transfer_id}",
+                self.urls.single_transfer(transfer_id),
                 json=body,
             )
         )
@@ -254,7 +285,7 @@ class FileSenderClient:
         await self._sign_send(
             self.http_client.build_request(
                 "PUT",
-                f"{self.base_url}/file/{file_info['id']}",
+                self.urls.file(file_info['id']),
                 params={"key": file_info["uid"]},
                 json=body,
             )
@@ -300,7 +331,7 @@ class FileSenderClient:
         return await self._sign_send(
             self.http_client.build_request(
                 "PUT",
-                f"{self.base_url}/file/{file_info['id']}/chunk/{offset}",
+                self.urls.chunk(file_info["id"], offset),
                 params={"key": file_info["uid"]},
                 content=chunk,
                 headers={
@@ -323,7 +354,7 @@ class FileSenderClient:
             : See [`Guest`][filesender.response_types.Guest]
         """
         return await self._sign_send(
-            self.http_client.build_request("POST", f"{self.base_url}/guest", json=body)
+            self.http_client.build_request("POST", self.urls.guest(), json=body)
         )
 
     async def _files_from_token(self, token: str) -> Iterable[DownloadFile]:
@@ -331,7 +362,7 @@ class FileSenderClient:
         Internal function that returns a list of file IDs for a given guest token
         """
         download_page = await self.http_client.get(
-            "https://filesender.aarnet.edu.au", params={"s": "download", "token": token}
+            self.urls.base, params={"s": "download", "token": token}
         )
         return files_from_page(download_page.content)
 
@@ -377,11 +408,8 @@ class FileSenderClient:
             file_size: The file size in bytes, optionally.
             file_name: The file name of the file being downloaded. This will impact the name by which it's saved.
         """
-        download_endpoint = urlunparse(
-            urlparse(self.base_url)._replace(path="/download.php")
-        )
         async with self.http_client.stream(
-            "GET", download_endpoint, params={"files_ids": file_id, "token": token}
+            "GET", self.urls.download(), params={"files_ids": file_id, "token": token}
         ) as res:
             # Determine filename from response, if not provided
             if file_name is None:
@@ -411,7 +439,7 @@ class FileSenderClient:
         Returns:
             : See [`ServerInfo`][filesender.response_types.ServerInfo].
         """
-        return (await self.http_client.get(f"{self.base_url}/info")).json()
+        return (await self.http_client.get(self.urls.server_info())).json()
 
     async def upload_workflow(
         self, files: List[Path], transfer_args: request.PartialTransfer = {}
