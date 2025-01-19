@@ -100,9 +100,16 @@ def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[T
                 # If this is a nested file, use the relative path from the root directory as the name
                 yield str(path.relative_to(root)), path
 
-@dataclass
 class EndpointHandler:
     base: str
+
+    def __init__(self, base: str) -> None:
+        # Backwards compatibility to support the old way of specifying the base URL
+        base = base.rstrip("/")
+        if base.endswith("/rest.php"):
+            logger.warning("The base URL should not include /rest.php. This will no longer be supported in a future version.")
+            base = base.removesuffix("/rest.php")
+        self.base = base
 
     def api(self) -> str:
         return f"{self.base}/rest.php"
