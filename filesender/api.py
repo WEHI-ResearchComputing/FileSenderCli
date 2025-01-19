@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Union
 from filesender.download import files_from_page, DownloadFile
 import filesender.response_types as response

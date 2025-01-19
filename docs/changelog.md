@@ -2,6 +2,10 @@
 
 ## Version 2.1.1
 
+### Changed
+
+* Providing a base URL that ends in `/rest.php` is now deprecated, but is still supported [[#33]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/29).
+
 ### Fixed
 
 * Base URL was not being set correctly for download operations [[#29]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/29).
