@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.1.1
+
+### Fixed
+
+* Base URL was not being set correctly for download operations [[#29]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/29).
+
 ## Version 2.1.0
 
 ### Added
