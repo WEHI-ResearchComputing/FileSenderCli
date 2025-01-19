@@ -5,6 +5,7 @@
 ### Fixed
 
 * Base URL was not being set correctly for download operations [[#29]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/29).
+* Drop support for Python 3.8 as it is now end-of-life, and add support for Python 3.13 [[#31]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/31)
 
 ## Version 2.1.0
 

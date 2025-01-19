@@ -4,7 +4,7 @@
 
 ## Installation
 
-Requires `Python>=3.8`
+Requires `Python>=3.9`
 
 ```bash
 pip install filesender-client
