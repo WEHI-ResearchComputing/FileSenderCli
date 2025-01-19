@@ -104,7 +104,7 @@ class GuestAuth(Auth):
                 if cookie.name.lower() == "csrfptoken":
                     self.csrf_token = cookie.value
         if self.csrf_token is None:
-            logger.warn("No CSRF token could be found!")
+            logger.warning("No CSRF token could be found!")
 
     def sign(self, request: SignType, client: AsyncClient) -> SignType:
         request.url = request.url.copy_add_param("vid", self.guest_token)
