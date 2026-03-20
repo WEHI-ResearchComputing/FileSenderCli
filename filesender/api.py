@@ -292,7 +292,7 @@ class FileSenderClient:
             self.http_client.build_request(
                 "PUT",
                 self.urls.file(file_info['id']),
-                params={"key": file_info["uid"]},
+                params={"key": file_info["id"]},
                 json=body,
             )
         )
@@ -338,7 +338,7 @@ class FileSenderClient:
             self.http_client.build_request(
                 "PUT",
                 self.urls.chunk(file_info["id"], offset),
-                params={"key": file_info["uid"]},
+                params={"key": file_info["id"]},
                 content=chunk,
                 headers={
                     "Content-Type": "application/octet-stream",
