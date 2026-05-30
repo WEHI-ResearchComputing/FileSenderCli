@@ -99,6 +99,12 @@ def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[T
                 # If this is a nested file, use the relative path from the root directory as the name
                 yield str(path.relative_to(root)), path
 
+def _file_key(file_info: response.File) -> str:
+    key = file_info.get("uid") or file_info.get("puid")  # type: ignore[typeddict-item]
+    if key is None:
+        raise Exception(f"File response for {file_info['name']!r} has neither 'uid' nor 'puid' field")
+    return key
+
 class EndpointHandler:
     base: str
 
@@ -292,7 +298,7 @@ class FileSenderClient:
             self.http_client.build_request(
                 "PUT",
                 self.urls.file(file_info['id']),
-                params={"key": file_info["uid"]},
+                params={"key": _file_key(file_info)},
                 json=body,
             )
         )
@@ -322,7 +328,7 @@ class FileSenderClient:
             task_limit=self.concurrent_chunks
         )
        ).stream() as streamer:
-            async for _ in tqdm(streamer, total=math.ceil(file_info["size"] / self.chunk_size), desc=file_info["name"]): # type: ignore
+            async for _ in tqdm(streamer, total=math.ceil(int(file_info["size"]) / self.chunk_size), desc=file_info["name"]): # type: ignore
                 pass
 
     async def _upload_chunk(
@@ -338,7 +344,7 @@ class FileSenderClient:
             self.http_client.build_request(
                 "PUT",
                 self.urls.chunk(file_info["id"], offset),
-                params={"key": file_info["uid"]},
+                params={"key": _file_key(file_info)},
                 content=chunk,
                 headers={
                     "Content-Type": "application/octet-stream",
@@ -430,7 +436,7 @@ class FileSenderClient:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             chunk_size = 8192
             chunk_size_mb = chunk_size / 1024 / 1024
-            with tqdm(desc=file_name, unit="MB", total=None if file_size is None else int(file_size / 1024 / 1024)) as progress:
+            with tqdm(desc=file_name, unit="MB", total=None if file_size is None else int(int(file_size) / 1024 / 1024)) as progress:
                 async with aiofiles.open(out_dir / file_name, "wb") as fp:
                     # We can't add the total here, because we don't know it: 
                     # https://github.com/filesender/filesender/issues/1555

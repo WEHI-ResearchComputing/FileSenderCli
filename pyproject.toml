@@ -25,7 +25,8 @@ dependencies = [
     "cryptography",
     "typing_extensions",
     "tenacity",
-    "tqdm"
+    "tqdm",
+    "click>=8.1.8",
 ]
 
 [tool.setuptools.packages.find]

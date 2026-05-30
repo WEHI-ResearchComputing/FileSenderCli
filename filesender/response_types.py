@@ -1,10 +1,11 @@
 from typing import List
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, NotRequired
 
 class File(TypedDict):
     id: int
     transfer_id: int
-    uid: str
+    uid: NotRequired[str]   # older FileSender servers
+    puid: NotRequired[str]  # newer FileSender servers
     name: str
     size: int
     sha1: str
