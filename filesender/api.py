@@ -100,6 +100,10 @@ def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[T
                 yield str(path.relative_to(root)), path
 
 def _file_key(file_info: response.File) -> str:
+    """
+    Returns the per-file upload key, checking both ``uid`` (older FileSender servers)
+    and ``puid`` (newer FileSender servers).
+    """
     if "uid" in file_info:
         return file_info["uid"]
     if "puid" in file_info:
