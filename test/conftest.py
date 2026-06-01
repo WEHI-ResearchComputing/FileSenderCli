@@ -1,12 +1,11 @@
-from pytest import Parser, Metafunc
+from pytest import Parser, Metafunc, skip
 
 def pytest_addoption(parser: Parser):
-    # Require the user to provide these arguments
-    parser.addoption("--base-url", required=True)
-    parser.addoption("--apikey", required=True)
-    parser.addoption("--username", required=True)
+    parser.addoption("--base-url", required=False)
+    parser.addoption("--apikey", required=False)
+    parser.addoption("--username", required=False)
     parser.addoption("--delay", required=False, default="0")
-    parser.addoption("--recipient", help="Email address that will be used as the recipient of the invitations", required=True)
+    parser.addoption("--recipient", help="Email address that will be used as the recipient of the invitations", required=False)
 
 def pytest_generate_tests(metafunc: Metafunc):
     argnames = []
@@ -14,7 +13,10 @@ def pytest_generate_tests(metafunc: Metafunc):
 
     for fixture in metafunc.fixturenames:
         if hasattr(metafunc.config.option, fixture):
+            value = getattr(metafunc.config.option, fixture)
+            if value is None:
+                skip(f"--{fixture} not provided")
             argnames.append(fixture)
-            argvalues.append(getattr(metafunc.config.option, fixture))
+            argvalues.append(value)
 
     metafunc.parametrize(argnames, [argvalues])

@@ -1,4 +1,4 @@
-from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Union
+from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Union, cast
 from filesender.download import files_from_page, DownloadFile
 import filesender.response_types as response
 import filesender.request_types as request
@@ -102,7 +102,8 @@ def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[T
 def _file_key(file_info: response.File) -> str:
     """
     Returns the per-file upload key, checking both ``uid`` (older FileSender servers)
-    and ``puid`` (newer FileSender servers).
+    and ``puid`` (newer FileSender servers). The field was renamed in
+    https://github.com/filesender/filesender/pull/2429.
     """
     if "uid" in file_info:
         return file_info["uid"]
@@ -333,7 +334,7 @@ class FileSenderClient:
             task_limit=self.concurrent_chunks
         )
        ).stream() as streamer:
-            async for _ in tqdm(streamer, total=math.ceil(int(file_info["size"]) / self.chunk_size), desc=file_info["name"]): # type: ignore
+            async for _ in tqdm(cast(AsyncIterator[None], streamer), total=math.ceil(int(file_info["size"]) / self.chunk_size), desc=file_info["name"]):
                 pass
 
     async def _upload_chunk(
@@ -441,7 +442,7 @@ class FileSenderClient:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             chunk_size = 8192
             chunk_size_mb = chunk_size / 1024 / 1024
-            with tqdm(desc=file_name, unit="MB", total=None if file_size is None else int(int(file_size) / 1024 / 1024)) as progress:
+            with tqdm(desc=file_name, unit="MB", total=None if file_size is None else int(file_size / 1024 / 1024)) as progress:
                 async with aiofiles.open(out_dir / file_name, "wb") as fp:
                     # We can't add the total here, because we don't know it: 
                     # https://github.com/filesender/filesender/issues/1555

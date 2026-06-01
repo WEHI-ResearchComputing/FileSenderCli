@@ -1,14 +1,20 @@
-from typing import List
-from typing_extensions import TypedDict, NotRequired
+from typing import List, Union
+from typing_extensions import TypedDict
 
-class File(TypedDict):
+class _FileBase(TypedDict):
     id: int
     transfer_id: int
-    uid: NotRequired[str]   # older FileSender servers
-    puid: NotRequired[str]  # newer FileSender servers
     name: str
-    size: int
+    size: Union[int, str]  # some FileSender servers return this as a string
     sha1: str
+
+class _FileWithUid(_FileBase):
+    uid: str
+
+class _FileWithPuid(_FileBase):
+    puid: str
+
+File = Union[_FileWithUid, _FileWithPuid]
 
 class Date(TypedDict):
     raw: int
