@@ -1,4 +1,4 @@
-from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Union, cast
+from typing import Any, Iterable, List, Optional, Tuple, AsyncIterator, Union
 from filesender.download import files_from_page, DownloadFile
 import filesender.response_types as response
 import filesender.request_types as request
@@ -334,7 +334,7 @@ class FileSenderClient:
             task_limit=self.concurrent_chunks
         )
        ).stream() as streamer:
-            async for _ in tqdm(cast(AsyncIterator[None], streamer), total=math.ceil(int(file_info["size"]) / self.chunk_size), desc=file_info["name"]):
+            async for _ in tqdm(streamer, total=math.ceil(int(file_info["size"]) / self.chunk_size), desc=file_info["name"]):
                 pass
 
     async def _upload_chunk(
