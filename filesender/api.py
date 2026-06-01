@@ -100,10 +100,11 @@ def iter_files(paths: Iterable[Path], root: Optional[Path] = None) -> Iterable[T
                 yield str(path.relative_to(root)), path
 
 def _file_key(file_info: response.File) -> str:
-    key = file_info.get("uid") or file_info.get("puid")  # type: ignore[typeddict-item]
-    if key is None:
-        raise Exception(f"File response for {file_info['name']!r} has neither 'uid' nor 'puid' field")
-    return key
+    if "uid" in file_info:
+        return file_info["uid"]
+    if "puid" in file_info:
+        return file_info["puid"]
+    raise Exception(f"File response for {file_info['name']!r} has neither 'uid' nor 'puid' field")
 
 class EndpointHandler:
     base: str
