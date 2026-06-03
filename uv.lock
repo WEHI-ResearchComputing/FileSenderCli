@@ -795,7 +795,7 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "black" },
     { name = "jupyter" },
@@ -820,33 +820,36 @@ requires-dist = [
     { name = "aiofiles" },
     { name = "aiostream" },
     { name = "beautifulsoup4" },
-    { name = "black", marker = "extra == 'dev'" },
     { name = "click", specifier = ">=8.2" },
     { name = "cryptography" },
     { name = "httpcore", specifier = ">=1.0.3" },
     { name = "httpx" },
-    { name = "jupyter", marker = "extra == 'dev'" },
-    { name = "jupyter-contrib-nbextensions", marker = "extra == 'dev'" },
-    { name = "mkdocs", marker = "extra == 'dev'" },
-    { name = "mkdocs-jupyter", marker = "extra == 'dev'" },
-    { name = "mkdocs-material", marker = "extra == 'dev'" },
-    { name = "mkdocs-typer", marker = "extra == 'dev'" },
-    { name = "mkdocstrings", extras = ["python"], marker = "extra == 'dev'" },
-    { name = "nbconvert", marker = "extra == 'dev'" },
-    { name = "notebook", marker = "extra == 'dev'", specifier = "<7" },
-    { name = "pandas", marker = "extra == 'dev'" },
-    { name = "pygments", marker = "extra == 'dev'" },
-    { name = "pymdown-extensions", marker = "extra == 'dev'" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'" },
     { name = "rich" },
-    { name = "seaborn", marker = "extra == 'dev'" },
     { name = "tenacity" },
     { name = "tqdm" },
     { name = "typer", specifier = ">=0.9.2" },
     { name = "typing-extensions" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black" },
+    { name = "jupyter" },
+    { name = "jupyter-contrib-nbextensions" },
+    { name = "mkdocs" },
+    { name = "mkdocs-jupyter" },
+    { name = "mkdocs-material" },
+    { name = "mkdocs-typer" },
+    { name = "mkdocstrings", extras = ["python"] },
+    { name = "nbconvert" },
+    { name = "notebook", specifier = "<7" },
+    { name = "pandas" },
+    { name = "pygments" },
+    { name = "pymdown-extensions" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "seaborn" },
+]
 
 [[package]]
 name = "fonttools"
