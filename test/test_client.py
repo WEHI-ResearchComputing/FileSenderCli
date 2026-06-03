@@ -7,7 +7,6 @@ from filesender.request_types import GuestOptions
 from filesender.benchmark import make_tempfile, make_tempfiles, benchmark
 from unittest.mock import MagicMock
 
-
 def count_files_recursively(path: Path) -> int:
     """
     Returns a recursive count of the number of files within a directory. Subdirectories are not counted.
@@ -151,7 +150,6 @@ async def test_upload_semaphore(
         )
     assert unlimited.time < limited.time
     assert unlimited.memory > limited.memory
-
 
 @pytest.mark.asyncio
 async def test_round_trip(base_url: str, username: str, apikey: str, recipient: str):
