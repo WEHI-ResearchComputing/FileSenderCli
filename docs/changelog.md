@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 2.1.2
+
+### Fixed
+
+* `LogParam.get_metavar()` raised a `TypeError` with Click 8.2+ due to a new `ctx` parameter being added to `ParamType.get_metavar()`
+* Fix for when the FileSender server has disabled CSRF tokens
+
+### Changed
+
+* Dev dependencies moved from `[project.optional-dependencies]` to `[tool.uv] dev-dependencies` so that `uv sync --dev` installs them correctly
+
 ## Version 2.1.1
 
 ### Changed
