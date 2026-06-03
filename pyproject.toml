@@ -7,7 +7,7 @@ name = "filesender-client"
 description = "FileSender Python CLI and API client"
 version = "2.1.1"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "BSD-3-Clause"}
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -26,7 +26,8 @@ dependencies = [
     "typing_extensions",
     "tenacity",
     "tqdm",
-    "click>=8.1.8",
+    # Click 8.2 introduced a breaking change (https://click.palletsprojects.com/en/stable/support-multiple-versions/#paramtype-methods-require-ctx)
+    "click>=8.2",
 ]
 
 [tool.setuptools.packages.find]
