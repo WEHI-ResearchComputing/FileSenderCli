@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "filesender-client"
 description = "FileSender Python CLI and API client"
-version = "2.1.2"
+version = "2.2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "BSD-3-Clause"}

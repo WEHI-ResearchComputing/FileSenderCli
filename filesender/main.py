@@ -9,6 +9,7 @@ from rich.pretty import pretty_repr
 from pathlib import Path
 from filesender.auth import Auth, UserAuth, GuestAuth
 from filesender.config import get_defaults
+import filesender.request_types as request
 from functools import wraps
 from asyncio import run
 from importlib.metadata import version
@@ -65,6 +66,12 @@ UploadFiles = Annotated[
         resolve_path=True,
         exists=True,
         help="Files and/or directories to upload",
+    ),
+]
+AupChecked = Annotated[
+    bool,
+    Option(
+        help="Signal that the Acceptable Use Policy has been accepted. Required when the FileSender instance has aup_enabled=true.",
     ),
 ]
 
@@ -158,6 +165,7 @@ def invite(
         bool, Option(help="If true, send you an email when the voucher expires.")
     ] = False,
     delay: Delay = 0,
+    aup_checked: AupChecked = False,
 ):
     """
     Invites a user to send files to you
@@ -166,26 +174,25 @@ def invite(
         auth=UserAuth(api_key=apikey, username=username, delay=delay),
         base_url=context.obj["base_url"],
     )
-    result: Guest = run(
-        client.create_guest(
-            {
-                "from": username,
-                "recipient": recipient,
-                "options": {
-                    "guest": {
-                        "valid_only_one_time": one_time,
-                        "can_only_send_to_me": only_to_me,
-                        "email_upload_started": email_upload_started,
-                        "email_upload_page_access": email_page_access,
-                        "email_guest_created": email_guest_created,
-                        "email_guest_created_receipt": email_receipt,
-                        "email_guest_expired": email_guest_expired,
-                    },
-                    "transfer": {"add_me_to_recipients": False},
-                },
-            }
-        )
-    )
+    guest_body: request.Guest = {
+        "from": username,
+        "recipient": recipient,
+        "options": {
+            "guest": {
+                "valid_only_one_time": one_time,
+                "can_only_send_to_me": only_to_me,
+                "email_upload_started": email_upload_started,
+                "email_upload_page_access": email_page_access,
+                "email_guest_created": email_guest_created,
+                "email_guest_created_receipt": email_receipt,
+                "email_guest_expired": email_guest_expired,
+            },
+            "transfer": {"add_me_to_recipients": False},
+        },
+    }
+    if aup_checked:
+        guest_body["aup_checked"] = True
+    result: Guest = run(client.create_guest(guest_body))
     logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
     logger.log(LogLevel.FEEDBACK.value, "Invitation successfully sent")
 
@@ -205,6 +212,7 @@ async def upload_voucher(
     concurrent_files: ConcurrentFiles = 1,
     concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
+    aup_checked: AupChecked = False,
 ):
     """
     Uploads files to a voucher that you have been invited to
@@ -219,9 +227,10 @@ async def upload_voucher(
     )
     await auth.prepare(client.http_client)
     await client.prepare()
-    result: Transfer = await client.upload_workflow(
-        files, {"from": email, "recipients": []}
-    )
+    transfer_args: request.PartialTransfer = {"from": email, "recipients": []}
+    if aup_checked:
+        transfer_args["aup_checked"] = True
+    result: Transfer = await client.upload_workflow(files, transfer_args)
     logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
     logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 
@@ -243,6 +252,7 @@ async def upload(
     concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
     delay: Delay = 0,
+    aup_checked: AupChecked = False,
 ):
     """
     Sends files to an email of choice
@@ -255,9 +265,18 @@ async def upload(
         concurrent_chunks=concurrent_chunks,
     )
     await client.prepare()
-    result: Transfer = await client.upload_workflow(
-        files, {"recipients": recipients, "from": username}
-    )
+    transfer_args: request.PartialTransfer = {
+        "recipients": recipients,
+        "from": username,
+        "options": {
+            "get_a_link": False,
+            "add_me_to_recipients": True,
+            "email_download_complete": True,
+        },
+    }
+    if aup_checked:
+        transfer_args["aup_checked"] = True
+    result: Transfer = await client.upload_workflow(files, transfer_args)
     logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
     logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 

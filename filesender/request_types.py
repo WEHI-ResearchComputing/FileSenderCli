@@ -41,6 +41,8 @@ PartialTransfer = TypedDict(
         "recipients": NotRequired[List[str]],
         # We need to use the expression syntax for TypedDict because `from` is a Python keyword
         "from": NotRequired[str],
+        # Required when the FileSender instance has aup_enabled=true
+        "aup_checked": NotRequired[bool],
     },
 )
 
@@ -85,5 +87,7 @@ Guest = TypedDict(
         # See https://github.com/filesender/filesender/issues/1772
         "options": NotRequired[GuestAllOptions],
         "expires": NotRequired[int],
+        # Required when the FileSender instance has aup_enabled=true
+        "aup_checked": NotRequired[bool],
     },
 )

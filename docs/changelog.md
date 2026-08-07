@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* `--aup-checked` flag for the `upload`, `upload-voucher`, and `invite` commands. This is required when the FileSender instance has `aup_enabled=true` [[#679]](https://github.com/filesender/filesender/issues/679)
+
 ## Version 2.1.2
 
 ### Fixed

@@ -199,3 +199,48 @@ async def test_client_download_url():
     mock_http_client.get.assert_called_once_with(
         "http://localhost:8080", params=dict(s="download", token=token)
     )
+
+
+@pytest.mark.asyncio
+async def test_client_transfer_create_aup_checked():
+    """
+    Tests that the transfer creation request body includes `aup_checked` when set.
+    This is required when the FileSender instance has aup_enabled=true
+    (see https://github.com/filesender/filesender/issues/679)
+    """
+    mock_http_client = MagicMock()
+    client = FileSenderClient(base_url="http://localhost:8080")
+    client.http_client = mock_http_client
+    try:
+        await client.create_transfer(
+            {
+                "files": [{"name": "file.txt", "size": 1}],
+                "aup_checked": True,
+            }
+        )
+    except Exception:
+        pass
+    json_body = mock_http_client.build_request.call_args.kwargs["json"]
+    assert json_body["aup_checked"] is True
+
+
+@pytest.mark.asyncio
+async def test_client_guest_create_aup_checked():
+    """
+    Tests that the guest creation request body includes `aup_checked` when set
+    """
+    mock_http_client = MagicMock()
+    client = FileSenderClient(base_url="http://localhost:8080")
+    client.http_client = mock_http_client
+    try:
+        await client.create_guest(
+            {
+                "recipient": "recipient@example.com",
+                "from": "sender@example.com",
+                "aup_checked": True,
+            }
+        )
+    except Exception:
+        pass
+    json_body = mock_http_client.build_request.call_args.kwargs["json"]
+    assert json_body["aup_checked"] is True
