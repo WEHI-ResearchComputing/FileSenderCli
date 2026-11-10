@@ -1,0 +1,160 @@
+"""
+Unit tests for how CLI options are turned into FileSender requests. These use a fake
+client, so unlike test_cli.py they don't need a FileSender server.
+"""
+
+from filesender.main import app
+from typer.testing import CliRunner
+import pytest
+import time
+from pathlib import Path
+from typing import List
+
+runner = CliRunner()
+
+
+class FakeClient:
+    """
+    Stands in for FileSenderClient in the CLI, and records what the CLI asks the server for
+    """
+
+    last: "FakeClient"
+
+    def __init__(self, **kwargs: object):
+        self.kwargs = kwargs
+        FakeClient.last = self
+
+    async def prepare(self) -> None:
+        pass
+
+    async def upload_workflow(self, files: List[Path], transfer_args: dict) -> dict:
+        self.files = files
+        self.transfer_args = transfer_args
+        return {}
+
+    async def create_guest(self, body: dict) -> dict:
+        self.guest = body
+        return {}
+
+
+def invoke_with_fake_client(
+    monkeypatch: pytest.MonkeyPatch, args: List[str]
+) -> FakeClient:
+    monkeypatch.setattr("filesender.main.FileSenderClient", FakeClient)
+    result = runner.invoke(
+        app,
+        ["--base-url", "http://localhost:8080", *args],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 0, result.output
+    return FakeClient.last
+
+
+def upload_args(file: Path, *extra: str) -> List[str]:
+    return [
+        "upload",
+        str(file),
+        "--username",
+        "sender@example.com",
+        "--apikey",
+        "abc",
+        "--recipients",
+        "recipient@example.com",
+        *extra,
+    ]
+
+
+def test_upload_default_transfer_args(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    """
+    Without the optional arguments, the server's defaults apply, except for get_a_link,
+    which is always turned off so that the recipients get an email
+    """
+    file = tmp_path / "file.txt"
+    file.write_text("hello")
+    client = invoke_with_fake_client(monkeypatch, upload_args(file))
+    assert client.transfer_args == {
+        "recipients": ["recipient@example.com"],
+        "from": "sender@example.com",
+        "options": {"email_download_complete": True, "get_a_link": False},
+    }
+
+
+def test_upload_transfer_args(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    file = tmp_path / "file.txt"
+    file.write_text("hello")
+    before = time.time()
+    client = invoke_with_fake_client(
+        monkeypatch,
+        upload_args(
+            file,
+            "--subject",
+            "Some subject",
+            "--message",
+            "Some message",
+            "--days-valid",
+            "7",
+            "--get-a-link",
+        ),
+    )
+    args = client.transfer_args
+    assert args["subject"] == "Some subject"
+    assert args["message"] == "Some message"
+    assert before + 7 * 86400 - 1 <= args["expires"] <= time.time() + 7 * 86400
+    assert args["options"]["get_a_link"] is True
+
+
+def test_upload_days_valid_must_be_positive(tmp_path: Path):
+    file = tmp_path / "file.txt"
+    file.write_text("hello")
+    result = runner.invoke(
+        app,
+        [
+            "--base-url",
+            "http://localhost:8080",
+            *upload_args(file, "--days-valid", "0"),
+        ],
+    )
+    assert result.exit_code != 0
+    assert "not in the range" in result.output
+
+
+def test_invite_guest_args(monkeypatch: pytest.MonkeyPatch):
+    before = time.time()
+    client = invoke_with_fake_client(
+        monkeypatch,
+        [
+            "invite",
+            "guest@example.com",
+            "--username",
+            "sender@example.com",
+            "--apikey",
+            "abc",
+            "--subject",
+            "Please send me the files",
+            "--message",
+            "Thanks!",
+            "--days-valid",
+            "3",
+        ],
+    )
+    guest = client.guest
+    assert guest["subject"] == "Please send me the files"
+    assert guest["message"] == "Thanks!"
+    assert before + 3 * 86400 - 1 <= guest["expires"] <= time.time() + 3 * 86400
+
+
+def test_invite_default_guest_args(monkeypatch: pytest.MonkeyPatch):
+    client = invoke_with_fake_client(
+        monkeypatch,
+        [
+            "invite",
+            "guest@example.com",
+            "--username",
+            "sender@example.com",
+            "--apikey",
+            "abc",
+        ],
+    )
+    assert "subject" not in client.guest
+    assert "message" not in client.guest
+    assert "expires" not in client.guest

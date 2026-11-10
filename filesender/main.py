@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+import time
 from typing import Any, List, Optional, Callable, Coroutine, Dict
 from typing_extensions import Annotated, ParamSpec, TypeVar
 from filesender.api import FileSenderClient
@@ -15,6 +16,7 @@ from importlib.metadata import version
 from rich.logging import RichHandler
 from filesender.log import LogParam, LogLevel, configure_extra_levels
 from filesender.response_types import Guest, Transfer
+import filesender.request_types as request
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +69,32 @@ UploadFiles = Annotated[
         help="Files and/or directories to upload",
     ),
 ]
+Subject = Annotated[
+    Optional[str],
+    Option(
+        help="Subject of the email that FileSender sends. Defaults to the server's standard subject."
+    ),
+]
+Message = Annotated[
+    Optional[str],
+    Option(help="Message to include in the email that FileSender sends"),
+]
+DaysValid = Annotated[
+    Optional[int],
+    Option(
+        min=1,
+        metavar="DAYS",
+        help="Number of days until it expires. Defaults to the server's default.",
+    ),
+]
+
+
+def expires_in(days: int) -> int:
+    """
+    Returns the Unix timestamp `days` days from now, as FileSender expects for `expires`
+    """
+    return int(time.time()) + days * 24 * 60 * 60
+
 
 context: Dict[Any, Any] = {"default_map": get_defaults()}
 app = Typer(name="filesender", pretty_exceptions_enable=False)
@@ -157,6 +185,9 @@ def invite(
     email_guest_expired: Annotated[
         bool, Option(help="If true, send you an email when the voucher expires.")
     ] = False,
+    subject: Subject = None,
+    message: Message = None,
+    days_valid: DaysValid = None,
     delay: Delay = 0,
 ):
     """
@@ -166,26 +197,29 @@ def invite(
         auth=UserAuth(api_key=apikey, username=username, delay=delay),
         base_url=context.obj["base_url"],
     )
-    result: Guest = run(
-        client.create_guest(
-            {
-                "from": username,
-                "recipient": recipient,
-                "options": {
-                    "guest": {
-                        "valid_only_one_time": one_time,
-                        "can_only_send_to_me": only_to_me,
-                        "email_upload_started": email_upload_started,
-                        "email_upload_page_access": email_page_access,
-                        "email_guest_created": email_guest_created,
-                        "email_guest_created_receipt": email_receipt,
-                        "email_guest_expired": email_guest_expired,
-                    },
-                    "transfer": {"add_me_to_recipients": False},
-                },
-            }
-        )
-    )
+    guest: request.Guest = {
+        "from": username,
+        "recipient": recipient,
+        "options": {
+            "guest": {
+                "valid_only_one_time": one_time,
+                "can_only_send_to_me": only_to_me,
+                "email_upload_started": email_upload_started,
+                "email_upload_page_access": email_page_access,
+                "email_guest_created": email_guest_created,
+                "email_guest_created_receipt": email_receipt,
+                "email_guest_expired": email_guest_expired,
+            },
+            "transfer": {"add_me_to_recipients": False},
+        },
+    }
+    if subject is not None:
+        guest["subject"] = subject
+    if message is not None:
+        guest["message"] = message
+    if days_valid is not None:
+        guest["expires"] = expires_in(days_valid)
+    result: Guest = run(client.create_guest(guest))
     logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
     logger.log(LogLevel.FEEDBACK.value, "Invitation successfully sent")
 
@@ -239,6 +273,15 @@ async def upload(
         ),
     ],
     context: Context,
+    subject: Subject = None,
+    message: Message = None,
+    days_valid: DaysValid = None,
+    get_a_link: Annotated[
+        bool,
+        Option(
+            help="If true, FileSender only creates a download link for you to share, and the recipients are not emailed. This is always sent to the server, because some servers turn it on by default."
+        ),
+    ] = False,
     concurrent_files: ConcurrentFiles = 1,
     concurrent_chunks: ConcurrentChunks = 2,
     chunk_size: ChunkSize = None,
@@ -254,10 +297,24 @@ async def upload(
         concurrent_files=concurrent_files,
         concurrent_chunks=concurrent_chunks,
     )
+    transfer_args: request.PartialTransfer = {
+        "recipients": recipients,
+        "from": username,
+        "options": {
+            # upload_workflow() turns this on by default, but its default options
+            # are replaced by any options passed in
+            "email_download_complete": True,
+            "get_a_link": get_a_link,
+        },
+    }
+    if subject is not None:
+        transfer_args["subject"] = subject
+    if message is not None:
+        transfer_args["message"] = message
+    if days_valid is not None:
+        transfer_args["expires"] = expires_in(days_valid)
     await client.prepare()
-    result: Transfer = await client.upload_workflow(
-        files, {"recipients": recipients, "from": username}
-    )
+    result: Transfer = await client.upload_workflow(files, transfer_args)
     logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
     logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
 
