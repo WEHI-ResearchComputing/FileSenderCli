@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* `--subject`, `--message` and `--days-valid` options for the `upload` and `invite` commands [[#9]](https://github.com/WEHI-ResearchComputing/FileSenderCli/issues/9)
+* `--get-a-link/--no-get-a-link` option for the `upload` command
+* `upload` prints each recipient's download link when it finishes. Previously the links were only visible in the transfer dumped by `--log-level VERBOSE`
+
+### Fixed
+
+* `upload` now always sends the `get_a_link` option, turned off unless `--get-a-link` is given. Servers that turn `get_a_link` on by default made the transfer link-only, so the `--recipients` were never emailed [[#43]](https://github.com/WEHI-ResearchComputing/FileSenderCli/pull/43)
+
 ## Version 2.1.2
 
 ### Fixed
