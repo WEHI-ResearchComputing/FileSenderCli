@@ -19,6 +19,15 @@ class FakeClient:
     """
 
     last: "FakeClient"
+    #: What the CLI printed, set by invoke_with_fake_client()
+    output: str = ""
+    #: The recipients of the transfer that upload_workflow() returns
+    recipients: List[dict] = [
+        {
+            "email": "recipient@example.com",
+            "download_url": "http://localhost:8080/?s=download&token=abc",
+        }
+    ]
 
     def __init__(self, **kwargs: object):
         self.kwargs = kwargs
@@ -30,7 +39,7 @@ class FakeClient:
     async def upload_workflow(self, files: List[Path], transfer_args: dict) -> dict:
         self.files = files
         self.transfer_args = transfer_args
-        return {}
+        return {"recipients": self.recipients}
 
     async def create_guest(self, body: dict) -> dict:
         self.guest = body
@@ -47,6 +56,7 @@ def invoke_with_fake_client(
         catch_exceptions=False,
     )
     assert result.exit_code == 0, result.output
+    FakeClient.last.output = result.output
     return FakeClient.last
 
 
@@ -116,6 +126,60 @@ def test_upload_days_valid_must_be_positive(tmp_path: Path):
     )
     assert result.exit_code != 0
     assert "not in the range" in result.output
+
+
+def test_upload_prints_download_links(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    """
+    Every recipient's download link is printed on its own line, unwrapped, even though
+    the test runner's output is narrower than the line
+    """
+    file = tmp_path / "file.txt"
+    file.write_text("hello")
+    long_token = "f13aea48-5e58-4dc3-8706-b8d84140ac5a" * 3
+    monkeypatch.setattr(
+        FakeClient,
+        "recipients",
+        [
+            {
+                "email": "recipient@example.com",
+                "download_url": f"http://localhost:8080/?s=download&token={long_token}",
+            },
+            {
+                "email": "other@example.com",
+                "download_url": "http://localhost:8080/?s=download&token=def",
+            },
+        ],
+    )
+    client = invoke_with_fake_client(monkeypatch, upload_args(file))
+    lines = client.output.splitlines()
+    assert (
+        f"Download link for recipient@example.com: http://localhost:8080/?s=download&token={long_token}"
+        in lines
+    )
+    assert (
+        "Download link for other@example.com: http://localhost:8080/?s=download&token=def"
+        in lines
+    )
+
+
+def test_upload_prints_get_a_link_download_link(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    """
+    A link-only transfer has one recipient without an email address
+    """
+    file = tmp_path / "file.txt"
+    file.write_text("hello")
+    monkeypatch.setattr(
+        FakeClient,
+        "recipients",
+        [{"email": "", "download_url": "http://localhost:8080/?s=download&token=abc"}],
+    )
+    client = invoke_with_fake_client(monkeypatch, upload_args(file, "--get-a-link"))
+    assert (
+        "Download link: http://localhost:8080/?s=download&token=abc"
+        in client.output.splitlines()
+    )
 
 
 def test_invite_guest_args(monkeypatch: pytest.MonkeyPatch):

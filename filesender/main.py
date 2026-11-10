@@ -4,7 +4,7 @@ import time
 from typing import Any, List, Optional, Callable, Coroutine, Dict
 from typing_extensions import Annotated, ParamSpec, TypeVar
 from filesender.api import FileSenderClient
-from typer import Typer, Option, Argument, Context, Exit
+from typer import Typer, Option, Argument, Context, Exit, echo
 from rich import print
 from rich.pretty import pretty_repr
 from pathlib import Path
@@ -317,6 +317,14 @@ async def upload(
     result: Transfer = await client.upload_workflow(files, transfer_args)
     logger.log(LogLevel.VERBOSE.value, pretty_repr(result))
     logger.log(LogLevel.FEEDBACK.value, "Upload completed successfully")
+    # Each recipient gets their own link. These are printed rather than logged, because
+    # Rich wraps log lines to the terminal width (80 columns when the output isn't a
+    # terminal, e.g. in CI), which would break the URLs.
+    for recipient in result["recipients"]:
+        if recipient["email"]:
+            echo(f"Download link for {recipient['email']}: {recipient['download_url']}")
+        else:
+            echo(f"Download link: {recipient['download_url']}")
 
 
 @app.command(context_settings=context)

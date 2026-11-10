@@ -6,6 +6,7 @@
 
 * `--subject`, `--message` and `--days-valid` options for the `upload` and `invite` commands [[#9]](https://github.com/WEHI-ResearchComputing/FileSenderCli/issues/9)
 * `--get-a-link/--no-get-a-link` option for the `upload` command
+* `upload` prints each recipient's download link when it finishes. Previously the links were only visible in the transfer dumped by `--log-level VERBOSE`
 
 ### Fixed
 
